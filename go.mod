@@ -1,4 +1,4 @@
-module github.com/sxstoo/dmm
+module github.com/sxsto/dmm
 
 go 1.16
 
