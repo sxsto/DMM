@@ -212,7 +212,7 @@ func (c *LoginController) Query() {
 				return
 			} else {
 				pin := v.([]interface{})[0].(string)
-				c.SetSession("pin", pin)
+				// c.SetSession("pin", pin)
 				if note := c.GetString("note"); note != "" {
 					if ck, err := models.GetJdCookie(pin); err == nil {
 						ck.Update(models.Note, note)
