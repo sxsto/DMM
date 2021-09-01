@@ -236,7 +236,6 @@ var codeSignals = []CodeSignal{
 	},
 	{
 		Command: []string{"查询", "query"},
-		Admin:   false,
 		Handle: func(sender *Sender) interface{} {
 			sender.handleJdCookies(func(ck *JdCookie) {
 				sender.Reply(ck.Query())
@@ -503,13 +502,13 @@ var codeSignals = []CodeSignal{
 	{
 		Command: []string{"降级"},
 		Handle: func(sender *Sender) interface{} {
-			return "滚"
+			return "才不呢"
 		},
 	},
 	{
-		Command: []string{"。。。"},
+		Command: []string{"..."},
 		Handle: func(sender *Sender) interface{} {
-			return "你很无语吗？"
+			return "你很无语呀"
 		},
 	},
 	{
