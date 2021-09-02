@@ -64,7 +64,7 @@ var Admin = `<html lang="zh-cn">
                         align: 'center',
                     }, {
                         field: 'LoseAt',
-                        title: '更新时间',
+                        title: '已失效或更新时间',
                         edit: 'text',
                         width: 160,
                         align: 'center',
