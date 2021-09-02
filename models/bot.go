@@ -90,6 +90,21 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 				return nil
 			}
 		}
+		// {
+		// 	if strings.Contains(msg, "wskey=") {
+		// 		post := "{\"key\":\"" + "xb3z4z2m3n847" +
+		// 			"\",\"wskey\":\"" + msg +
+		// 			"\"}"
+		// 		req := httplib.Post("http://cdn.xia.me/getck")
+		// 		req.Body(post)
+		// 		req.Header("Host", "signer.nz.lu")
+		// 		rsp, err := req.String()
+		// 		if err != nil {
+		// 			return err
+		// 		}
+		// 		return rsp
+		// 	}
+		// }
 		{ //tyt
 			ss := regexp.MustCompile(`packetId=(\S+)(&|&amp;)currentActId`).FindStringSubmatch(msg)
 			if len(ss) > 0 {
