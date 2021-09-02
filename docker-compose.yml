@@ -1,0 +1,18 @@
+version: "3"
+services:
+  qinglong-xdd:
+    image: sxsto/dmm:latest
+    container_name: dmm
+    restart: unless-stopped
+    tty: true
+    ports:
+      - 5700:5700
+      - 5701:5701
+    environment:
+      - ENABLE_HANGUP=true
+      - ENABLE_WEB_PANEL=true
+      - DMM_REPO_URL=https://ghproxy.com/https://github.com/sxsto/dmm
+    volumes:
+      - ./config:/ql/config
+      - ./db:/ql/db
+      - ./dmm:/ql/dmm
