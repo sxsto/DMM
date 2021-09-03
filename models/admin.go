@@ -118,7 +118,13 @@ var Admin = `<html lang="zh-cn">
                         title: 'PtPin',
                         width: 150,
                         align: 'center',
-                    }, {
+                    },{
+                        field: 'WsKey',
+                        title: 'WsKey',
+                        width: 80,
+                        edit: 'text',
+                        align: 'center',
+                    },{
                         field: 'PtKey',
                         title: 'PtKey',
                         width: 150,
