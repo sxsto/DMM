@@ -137,7 +137,7 @@ func initCookie() {
 }
 
 func CookieOK(ck *JdCookie) bool {
-	// fmt.Println(ck.PtPin)
+	// fmt.Println(ck.WsKey)
 	cookie := "pt_key=" + ck.PtKey + ";pt_pin=" + ck.PtPin + ";"
 	// fmt.Println(cookie)
 	// jdzz(cookie, make(chan int64))
@@ -166,8 +166,10 @@ func CookieOK(ck *JdCookie) bool {
 			if ck.Available == True {
 				// ck.Push(fmt.Sprintf("失效账号，%s", ck.PtPin))
 				JdCookie{}.Push(fmt.Sprintf("失效账号，%s", ck.Nickname))
+				// logs.Info(ck.WsKey)
+				// logs.Info("进入失效账号")
 				var pinky = fmt.Sprintf("pin=%s;wskey=%s;", ck.PtPin, ck.WsKey)
-				msg1 := cmd(fmt.Sprintf(`wskey="%s" python3 wspt.py`, pinky), &Sender{})
+				msg1 := cmd(fmt.Sprintf(`python3 sign.py "%s"`, pinky), &Sender{})
 				JdCookie{}.Push(fmt.Sprintf("自动转换wskey---%s", msg1))
 				ss := regexp.MustCompile(`pt_key=([^;=\s]+);pt_pin=([^;=\s]+)`).FindAllStringSubmatch(msg1, -1)
 				if len(ss) > 0 {
