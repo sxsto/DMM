@@ -94,8 +94,8 @@ func (ck *JdCookie) Query() string {
 		go tytCoupon(cookie, tyt)
 		go mmCoin(cookie, mmc)
 		go jdzz(cookie, zjb)
-		today := time.Now().Local().Format("2006-01-02")
-		yestoday := time.Now().Local().Add(-time.Hour * 24).Format("2006-01-02")
+		today := time.Now().Local().Format("2006-01-02 15:04:05")
+		yestoday := time.Now().Local().Add(-time.Hour * 24).Format("2006-01-02 15:04:05")
 		page := 1
 		end := false
 		for {

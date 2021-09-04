@@ -111,7 +111,7 @@ var codeSignals = []CodeSignal{
 			//if sender.Type == "qqg" {
 			//	sender.Type = "qq"
 			//}
-			zero, _ := time.ParseInLocation("2006-01-02", time.Now().Local().Format("2006-01-02"), time.Local)
+			zero, _ := time.ParseInLocation("2006-01-02 15:04:05", time.Now().Local().Format("2006-01-02 15:04:05"), time.Local)
 			var u User
 			var ntime = time.Now()
 			var first = false

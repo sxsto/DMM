@@ -412,7 +412,7 @@ func getT(c *Container, token *Token) (error, bool) {
 		}
 		c.Token, _ = jsonparser.GetString(data, "data", "token")
 		token.Token, _ = jsonparser.GetString(data, "data", "token")
-		zero, _ := time.ParseInLocation("2006-01-02", time.Now().Local().Format("2006-01-02"), time.Local)
+		zero, _ := time.ParseInLocation("2006-01-02 15:04:05", time.Now().Local().Format("2006-01-02 15:04:05"), time.Local)
 		token.Expiration = zero
 		setSqlToken(token)
 		logs.Info(c.Token + token.Expiration.String())
