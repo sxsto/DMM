@@ -142,7 +142,7 @@ var codeSignals = []CodeSignal{
 					coin = 2
 				}
 				if total[0]%13 == 0 {
-					coin = 1000000
+					coin = 8
 				}
 				db.Model(&u).Updates(map[string]interface{}{
 					"active_at": ntime,
