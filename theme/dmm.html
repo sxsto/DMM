@@ -12,13 +12,6 @@
             overflow: hidden;
             font-style: sans-serif;
         }
-        /* body{
-            width: 100%;
-            height: 100%;
-            font-family: 'Open Sans',sans-serif;
-            margin: 0;
-            background-color: #4A374A;
-        } */
         #login{
             position: absolute;
             top: 50%;
@@ -88,29 +81,13 @@
                 <h1>❤️ 大米米 ❤️</h1>
                 <h2>人生苦短，何必烦忧</h2>
                 <h3>管理员登录</h3>
-                <!-- <p>扫描下方二维码或者点击跳转APP使用</p> -->
                 <ul class="actions">
                 <div>
-		<!-- <img id="qrcode" height="170em" src="./ok.svg" /> -->
 		</div>
 		    <li><input type="text" required="required" id="pin" placeholder="用户名" name="u" />
-                <button class="but" onclick="login()">登录</button></a>
-                    <!--<li><a id="login" class="button special" title="APP登录" href="./login.html">控制中心</a>-->
-                    <!--<li><a id="BeanChange" class="button special" title="走势图" href="./BeanChange.html">走势图</a>
-                </li> -->
-                </ul>
-                <!-- <p>
-                    <a href="http://www.highdimen.com" target="_blank" style="color:yellow;font-weight:bold">[备用扫码]</a>
-                    <a href="https://t.me/jstool" target="_blank" style="color:red;font-weight:bold"> [TG群]</a><br>
-                    <a style="color:#00effb;font-weight:bold"> [全自动运行]</a>
-                    <br /> <a style="font-size:12px;"> App确认后即可（无视升级提示）</a>
-                    <br /> <a style="font-size:12px;">未添加过的用户会自动新增账号，若已添加则会自动更新有效期（一个月）</a>
-                </p> -->
-
+                <button class="but" onclick="login()">登录</button></a>  
+            </li>
                 <div class="more">
-                    <!-- <a class="qq_group" id="qq_group" target="_blank" href=""> -->
-                        <!-- <img border="0" src="static/image/qq.png" alt="联系客服" title="联系客服"> -->
-                    <!-- </a> -->
                     <br /> <a id="UserNum" style="font-size:12px;"></a>
                     <br />欢迎🧡使用
                     
@@ -118,58 +95,9 @@
             </div>
         </section>
     </div>
-    <!--<div id="qrcontainer" class="hidden">
-        <div class="qframe" id="qframe">
-            <div id="refresh_qrcode" class="hidden">
-                <div>
-                    <h3>二维码已失效</h3>
-                    <div class="refresh">刷新</div>
-                </div>
-            </div>
-            <div id="qrcode"></div>
-            <div class="ps-box">
-                <input type="text" id="ps" placeholder="可在此输入备注名">
-            </div>
-            <div class="info">
-                <a style="color:#aaaaaa;">请使用京东APP扫码</a>
-                <br> <a style="color:#aaaaaa;">有效期为一个月</a>
-                <br>
-            </div>
-            <div class="qframe-close" title="关闭">✖</div>
-        </div>
-    </div>
-	
- <div>
-        </div>-->
 </body>
-<script>
-    // var timer;
-    // var qrcode = document.getElementById("qrcode")
-    // var loginUrl = ""
-    // var success = "https://ghproxy.com/https://raw.githubusercontent.com/sxsto/dmm/main/xdd/static/ok.svg";
-    // var jumpapp = document.getElementById('jumpapp')
-    // var hd = document.getElementById("hd")
-//   function GetQrCode() {
-// swal("请务必看一遍", "✌️京东APP扫码后 页面跳转即为成功✌️\n❤️打开APP完成新手任务❤️\n❣️京东❣️➨我的➨更多工具➨(农场、萌宠、工厂、宠汪汪、金榜创造营、领现金、健康社区、种豆得豆)\n❣️京喜❣️➨我的➨(农场、牧场、工厂、财富岛)\n❣️金融❣️➨我的➨(种摇钱树、天天提鹅、养猪猪)\n☂️京东账号绑定微信可以更多¥¥☂️\n☠️请关闭免密支付☠️","success")
-//   }
-    // function showQrcode() {
-    //     var xmlhttp = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
-    //     xmlhttp.onreadystatechange = function() {
-    //         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-    //             data = JSON.parse(xmlhttp.responseText)
-    //             if (data.url && data.url.indexOf("http") != -1) {
-    //                 qrcode.src = "data:image/png;base64," + data.img
-    //                 loginUrl = data.url
-    //             } else {
-    //                 showQrcode()
-    //             }
-    //         }
-    //     }
-    //     xmlhttp.open("GET", "/api/login/qrcode", true);
-    //     xmlhttp.send();
-    // }
-    // showQrcode()
 
+<script>
 	function login()
     {
         const userName = document.querySelector('#pin').value
