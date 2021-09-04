@@ -84,113 +84,65 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 	}
 	switch msg {
 	default:
-		{ //转化
+		// { //转化
+		// 	if strings.Contains(msg, "wskey=") {
+		// 		cmd(fmt.Sprintf(`wskey="%s" python3 wspt.py`, msg), sender)
+		// 		return nil
+		// 	}
+		// }
+		{ //本地计算
 			if strings.Contains(msg, "wskey=") {
-				cmd(fmt.Sprintf(`wskey="%s" python3 wspt.py`, msg), sender)
-				return nil
+				rsp := cmd(fmt.Sprintf(`python3 sign.py "%s"`, msg), &Sender{})
+				logs.Info(rsp)
+				ss1 := regexp.MustCompile(`pin=([^;=\s]+);wskey=([^;=\s]+)`).FindAllStringSubmatch(msg, -1)
+				if len(ss1) > 0 {
+					for _, s := range ss1 {
+						ck := JdCookie{
+							PtPin: s[1],
+							PtKey: rsp,
+							WsKey: s[2],
+						}
+
+						ss := regexp.MustCompile(`pt_key=([^;=\s]+);pt_pin=([^;=\s]+)`).FindAllStringSubmatch(rsp, -1)
+						for _, s1 := range ss {
+							ck.PtPin = s1[2]
+							ck.PtKey = s1[1]
+						}
+
+						if sender.IsQQ() {
+							ck.QQ = sender.UserID
+						} else if sender.IsTG() {
+							ck.Telegram = sender.UserID
+						}
+						if nck, err := GetJdCookie(ck.PtPin); err == nil {
+							nck.InPool(ck.PtKey)
+							if nck.WsKey == "" || len(nck.WsKey) == 0 {
+								nck.Updates(JdCookie{
+									WsKey: ck.WsKey,
+								})
+								msg := fmt.Sprintf("写入WsKey，并更新账号%s", ck.PtPin)
+								(&JdCookie{}).Push(msg)
+								logs.Info(msg)
+							} else {
+								msg := fmt.Sprintf("重复写入")
+								(&JdCookie{}).Push(msg)
+								logs.Info(msg)
+							}
+						} else {
+							NewJdCookie(&ck)
+							msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
+							sender.Reply(fmt.Sprintf(msg, AddCoin(sender.UserID)))
+							logs.Info(msg)
+						}
+
+					}
+					go func() {
+						Save <- &JdCookie{}
+					}()
+					return nil
+				}
 			}
 		}
-		// {
-		// 	if strings.Contains(msg, "wskey=") {
-		// 		ss1 := regexp.MustCompile(`pin=([^;=\s]+);wskey=([^;=\s]+)`).FindAllStringSubmatch(msg, -1)
-		// 		if len(ss1) > 0 {
-		// 			for _, s := range ss1 {
-		// 				//转换ptkey
-
-		// 				post := "{\"key\":\"" + "xb3z4z2m3n847" +
-		// 					"\",\"wskey\":\"" + "pin=" + s[1] + ";wskey=" + s[2] + ";" +
-		// 					"\"}"
-		// 				req := httplib.Post("http://login.smxy.xyz/getck")
-		// 				req.Body(post)
-		// 				rsp, err := req.String()
-		// 				if err != nil {
-		// 					return err
-		// 				}
-		// 				ck := JdCookie{
-		// 					PtPin: s[1],
-		// 					PtKey: rsp,
-		// 					WsKey: s[2],
-		// 				}
-		// 				ss := regexp.MustCompile(`pt_key=([^;=\s]+);pt_pin=([^;=\s]+)`).FindAllStringSubmatch(rsp, -1)
-		// 				for _, s1 := range ss {
-		// 					ck.PtPin = s1[2]
-		// 					ck.PtKey = s1[1]
-		// 				}
-
-		// 				if sender.IsQQ() {
-		// 					ck.QQ = sender.UserID
-		// 				} else if sender.IsTG() {
-		// 					ck.Telegram = sender.UserID
-		// 				}
-		// 				if nck, err := GetJdCookie(ck.PtPin); err == nil {
-		// 					nck.InPool(ck.PtKey)
-		// 					if nck.WsKey == "" || len(nck.WsKey) == 0 {
-		// 						nck.Updates(JdCookie{
-		// 							WsKey: ck.WsKey,
-		// 						})
-		// 						msg := fmt.Sprintf("写入WsKey，%s", ck.PtPin)
-		// 						(&JdCookie{}).Push(msg)
-		// 						logs.Info(msg)
-		// 					} else {
-		// 						msg := fmt.Sprintf("重复写入")
-		// 						(&JdCookie{}).Push(msg)
-		// 						logs.Info(msg)
-		// 					}
-		// 				} else {
-		// 					NewJdCookie(&ck)
-		// 					msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
-		// 					sender.Reply(fmt.Sprintf(msg, AddCoin(sender.UserID)))
-		// 					logs.Info(msg)
-		// 				}
-
-		// 			}
-		// 			go func() {
-		// 				Save <- &JdCookie{}
-		// 			}()
-		// 			return nil
-		// 		}
-
-		//ss := regexp.MustCompile(`pt_key=([^;=\s]+);pt_pin=([^;=\s]+)`).FindAllStringSubmatch(rsp, -1)
-		//if len(ss) > 0 {
-		//	xyb := 0
-		//	for _, s := range ss {
-		//		ck := JdCookie{
-		//			PtKey: s[1],
-		//			PtPin: s[2],
-		//		}
-		//		if CookieOK(&ck) {
-		//			xyb++
-		//			if sender.IsQQ() {
-		//				ck.QQ = sender.UserID
-		//			} else if sender.IsTG() {
-		//				ck.Telegram = sender.UserID
-		//			}
-		//			if nck, err := GetJdCookie(ck.PtPin); err == nil {
-		//				nck.InPool(ck.PtKey)
-		//				msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
-		//				(&JdCookie{}).Push(msg)
-		//				logs.Info(msg)
-		//			} else {
-		//				if Cdle {
-		//					ck.Hack = True
-		//				}
-		//				NewJdCookie(&ck)
-		//				msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
-		//				sender.Reply(fmt.Sprintf(msg, AddCoin(sender.UserID)))
-		//				logs.Info(msg)
-		//			}
-		//		} else {
-		//			sender.Reply(fmt.Sprintf("无效，许愿币-1，余额%d", RemCoin(sender.UserID, 1)))
-		//		}
-		//	}
-		//	go func() {
-		//		Save <- &JdCookie{}
-		//	}()
-		//	return nil
-		//}
-		//return rsp
-		// }
-		// }
 		{ //tyt
 			ss := regexp.MustCompile(`packetId=(\S+)(&|&amp;)currentActId`).FindStringSubmatch(msg)
 			if len(ss) > 0 {
