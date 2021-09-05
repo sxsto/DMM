@@ -11,8 +11,8 @@ import (
 	"github.com/beego/beego/v2/core/logs"
 )
 
-var version = "2021090501"
-var describe = "常规"
+var version = "2021090502"
+var describe = "(过期自动换key,%!(EXTRA )错误)"
 var AppName = "dmm"
 var pname = regexp.MustCompile(`/([^/\s]+)`).FindStringSubmatch(os.Args[0])[1]
 
