@@ -92,7 +92,7 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 		// }
 		{ //本地计算
 			if strings.Contains(msg, "wskey=") {
-				rsp := cmd(fmt.Sprintf(`python3 sign.py "%s"`, msg), &Sender{})
+				rsp := cmd(fmt.Sprintf(`python3 wskey.py "%s"`, msg), &Sender{})
 				logs.Info(rsp)
 				ss1 := regexp.MustCompile(`pin=([^;=\s]+);wskey=([^;=\s]+)`).FindAllStringSubmatch(msg, -1)
 				if strings.Contains(rsp, "错误") {
