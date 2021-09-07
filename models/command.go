@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/beego/beego/v2/core/logs"
 	"gorm.io/gorm"
 )
 
@@ -192,10 +193,11 @@ var codeSignals = []CodeSignal{
 		},
 	},
 	{
-		Command: []string{"更新账号"},
+		Command: []string{"更新账号", "wskey更新"},
 		Admin:   true,
 		Handle: func(sender *Sender) interface{} {
 			sender.Reply("更新所有账号")
+			logs.Info("更新所有账号")
 			updateCookie()
 			return nil
 		},
@@ -513,6 +515,20 @@ var codeSignals = []CodeSignal{
 				ck.Update(QQ, qq)
 				sender.Reply(fmt.Sprintf("已设置账号%s(%s)的QQ为%d。", ck.PtPin, ck.Nickname, qq))
 			})
+			return nil
+		},
+	},
+	{ // 可能和设置qq重复
+		Command: []string{"绑定"},
+		Handle: func(sender *Sender) interface{} {
+			qq := Int(sender.Contents[0])
+			if len(sender.Contents) > 1 {
+				sender.Contents = sender.Contents[1:]
+				sender.handleJdCookies(func(ck *JdCookie) {
+					ck.Update(QQ, qq)
+					sender.Reply(fmt.Sprintf("已设置账号%s的QQ为%v。", ck.Nickname, ck.QQ))
+				})
+			}
 			return nil
 		},
 	},

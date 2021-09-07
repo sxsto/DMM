@@ -9,22 +9,22 @@ return reply(
           `壁纸` => `http://api.btstu.cn/sjbz/?lx=dongman`
           `风景` => `https://laosepi.org/gqpic.php`
           `美女` => `https://api.lyiqk.cn/purelady`
-         `二次元图` => `https://acg.toubiec.cn/random.php`
-         `网易热评` => `https://api.uomg.com/api/comments.163?format=json`
-         `动漫头像` => `http://shengapi.cn/api/image/acgtx.php`
-         `舔狗日记` => `http://shengapi.cn/api/tgrj.php`
-         `.*骚话.*`=>`https://api.vvhan.com/api/sao`
-         `文明` => `http://api.btstu.cn/sjbz/zsy.php`
+          `二次元图` => `https://acg.toubiec.cn/random.php`
+          `网易热评` => `https://api.uomg.com/api/comments.163?format=json`
+          `动漫头像` => `http://shengapi.cn/api/image/acgtx.php`
+          `舔狗日记` => `http://shengapi.cn/api/tgrj.php`
+          `.*骚话.*`=>`https://api.vvhan.com/api/sao`
+          `文明` => `http://api.btstu.cn/sjbz/zsy.php`
           `富强` => `http://api.btstu.cn/sjbz/?m_lx=suiji`
           `和谐` => `http://api.nmb.show/xiaojiejie1.php`
           `民主` => `http://api.nmb.show/xiaojiejie2.php`
           `语录` => `https://api.ixiaowai.cn/ylapi/index.php`
           `舔狗` => `https://api.ixiaowai.cn/tgrj/index.php`
-          `.*一言.*`=>`https://api.ixiaowai.cn/ylapi/index.php`
-        `更新` => `发送扫码或进入网站绑定QQ`
-        `公告` => `发送扫码绑定QQ后输入"查询"`
-        `密码` => `你猜`
-        `菜单` => `
+          `.*一言.*`=>`http://www.shengapi.cn/api/yiyan.php`
+          `更新` => `发送扫码或进入网站绑定QQ`
+          `公告` => `发送扫码绑定QQ后输入"查询"`
+          `密码` => `你猜`
+          `菜单` => `
                 京东菜单
        ———————————     
             更新  丨  查询       
