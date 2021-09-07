@@ -51,8 +51,8 @@ def appjmp(wskey, tokenKey):
         print("wskey格式错误！")
     else:
         print(jd_ck)
-
-
+        
+        
 def checkwskey(wskey):
     flag = "wskey=" in wskey
     flag1 = "pin=" in wskey
@@ -60,6 +60,7 @@ def checkwskey(wskey):
        return True
     else :
        return False
-
+        
 if __name__ == '__main__':
     getToken(ws)
+

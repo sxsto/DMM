@@ -139,7 +139,7 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 								}
 							} else {
 								NewJdCookie(&ck)
-								msg := fmt.Sprintf("添加账号，用户名: %s", ck.PtPin)
+								msg := fmt.Sprintf("添加账号，用户名：%s", ck.PtPin)
 								sender.Reply(fmt.Sprintf(msg))
 								logs.Info(msg)
 							}
@@ -151,6 +151,7 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 						return nil
 					}
 				}
+
 			}
 		}
 		{ //tyt
@@ -194,6 +195,10 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 							if nck, err := GetJdCookie(ck.PtPin); err == nil {
 								nck.InPool(ck.PtKey)
 								msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
+								if sender.IsQQ() {
+									ck.Update(QQ, ck.QQ)
+								}
+								sender.Reply(fmt.Sprintf(msg))
 								(&JdCookie{}).Push(msg)
 								logs.Info(msg)
 							} else {
@@ -201,7 +206,10 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 									ck.Hack = True
 								}
 								NewJdCookie(&ck)
-								msg := fmt.Sprintf("添加账号，用户名: %s", ck.PtPin)
+								msg := fmt.Sprintf("添加账号，账号名: %s", ck.PtPin)
+								if sender.IsQQ() {
+									ck.Update(QQ, ck.QQ)
+								}
 								sender.Reply(fmt.Sprintf(msg))
 								logs.Info(msg)
 							}
