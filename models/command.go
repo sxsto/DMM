@@ -685,7 +685,7 @@ var codeSignals = []CodeSignal{
 		Handle: func(sender *Sender) interface{} {
 			sender.handleJdCookies(func(ck *JdCookie) {
 				ck.Update(Priority, -1)
-				sender.Reply(fmt.Sprintf("已屏蔽账号%s(%s)", ck.PtPin, ck.Nickname, ck.Priority))
+				sender.Reply(fmt.Sprintf("已取消账号%s(%s)", ck.PtPin, ck.Nickname, ck.Priority))
 			})
 			return nil
 		},
@@ -696,7 +696,7 @@ var codeSignals = []CodeSignal{
 		Handle: func(sender *Sender) interface{} {
 			sender.handleJdCookies(func(ck *JdCookie) {
 				ck.Update(Priority, 2)
-				sender.Reply(fmt.Sprintf("已取消屏蔽账号%s(%s)", ck.PtPin, ck.Nickname, ck.Priority))
+				sender.Reply(fmt.Sprintf("已恢复账号%s(%s)", ck.PtPin, ck.Nickname, ck.Priority))
 			})
 			return nil
 		},
