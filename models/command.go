@@ -679,28 +679,6 @@ var codeSignals = []CodeSignal{
 			return nil
 		},
 	},
-	{ //不运行
-		Command: []string{"取消账号", "hack"},
-		Admin:   true,
-		Handle: func(sender *Sender) interface{} {
-			sender.handleJdCookies(func(ck *JdCookie) {
-				ck.Update(Priority, -1)
-				sender.Reply(fmt.Sprintf("已取消账号%s(%s)", ck.PtPin, ck.Nickname, ck.Priority))
-			})
-			return nil
-		},
-	},
-	{
-		Command: []string{"恢复账号", "unhack"},
-		Admin:   true,
-		Handle: func(sender *Sender) interface{} {
-			sender.handleJdCookies(func(ck *JdCookie) {
-				ck.Update(Priority, 2)
-				sender.Reply(fmt.Sprintf("已恢复账号%s(%s)", ck.PtPin, ck.Nickname, ck.Priority))
-			})
-			return nil
-		},
-	},
 	{
 		Command: []string{"转账"},
 		Handle: func(sender *Sender) interface{} {
