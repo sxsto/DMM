@@ -84,12 +84,6 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 	}
 	switch msg {
 	default:
-		// { //转化
-		// 	if strings.Contains(msg, "wskey=") {
-		// 		cmd(fmt.Sprintf(`wskey="%s" python3 wspt.py`, msg), sender)
-		// 		return nil
-		// 	}
-		// }
 		{ //本地计算
 			if strings.Contains(msg, "wskey=") {
 				rsp := cmd(fmt.Sprintf(`python3 wskey.py "%s"`, msg), &Sender{})
@@ -128,14 +122,25 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 									(&JdCookie{}).Push(msg)
 									logs.Info(msg)
 								} else {
-									msg := fmt.Sprintf("重复写入")
-									(&JdCookie{}).Push(msg)
-									logs.Info(msg)
+									if nck.WsKey == ck.WsKey {
+										msg := fmt.Sprintf("重复写入")
+										sender.Reply(fmt.Sprintf(msg))
+										(&JdCookie{}).Push(msg)
+										logs.Info(msg)
+									} else {
+										nck.Updates(JdCookie{
+											WsKey: ck.WsKey,
+										})
+										msg := fmt.Sprintf("写入WsKey，并更新账号%s", ck.PtPin)
+										sender.Reply(fmt.Sprintf(msg))
+										(&JdCookie{}).Push(msg)
+										logs.Info(msg)
+									}
 								}
 							} else {
 								NewJdCookie(&ck)
-								msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
-								sender.Reply(fmt.Sprintf(msg, AddCoin(sender.UserID)))
+								msg := fmt.Sprintf("添加账号，用户名: %s", ck.PtPin)
+								sender.Reply(fmt.Sprintf(msg))
 								logs.Info(msg)
 							}
 
@@ -196,8 +201,8 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 									ck.Hack = True
 								}
 								NewJdCookie(&ck)
-								msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
-								sender.Reply(fmt.Sprintf(msg, AddCoin(sender.UserID)))
+								msg := fmt.Sprintf("添加账号，用户名: %s", ck.PtPin)
+								sender.Reply(fmt.Sprintf(msg))
 								logs.Info(msg)
 							}
 						}

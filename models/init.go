@@ -32,4 +32,5 @@ func init() {
 	initTask()
 	initRepos()
 	// go InitProxy()
+	intiSky()
 }

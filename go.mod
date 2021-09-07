@@ -39,6 +39,7 @@ require (
 	gorm.io/driver/postgres v1.1.0
 	gorm.io/driver/sqlite v1.1.4
 	gorm.io/gorm v1.21.13
+	github.com/robfig/cron/v3 v3.0.1
 )
 
 require (
