@@ -61,7 +61,7 @@ func Update(sender *Sender) error {
 		sender.Reply("大咪咪拉取代码成功")
 	}
 	sender.Reply("大咪咪正在编译程序")
-	rtn, err = exec.Command("sh", "-c", "cd "+ExecPath+" && go build -o "+pname).Output()
+	_, err = exec.Command("sh", "-c", "cd "+ExecPath+" && go build -o "+pname).Output()
 	if err != nil {
 		return errors.New("大咪咪编译失败：" + err.Error())
 	} else {
