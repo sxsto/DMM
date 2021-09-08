@@ -187,9 +187,10 @@ func updateCookie() {
 					Save <- &JdCookie{}
 				}()
 			}
-			(&JdCookie{}).Push(fmt.Sprintf("所有CK转换完成，共%d个", len(cks)))
 		}
+		(&JdCookie{}).Push(fmt.Sprintf("所有CK转换完成，共%d个", len(cks)))
 	}
+
 }
 
 func CookieOK(ck *JdCookie) bool {
