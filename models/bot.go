@@ -91,6 +91,7 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 				ss1 := regexp.MustCompile(`pin=([^;=\s]+);wskey=([^;=\s]+)`).FindAllStringSubmatch(msg, -1)
 				if strings.Contains(rsp, "错误") {
 					logs.Error("wskey错误")
+					sender.Reply(fmt.Sprintf("wskey错误"))
 				} else {
 
 					if len(ss1) > 0 {
@@ -118,7 +119,11 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 									nck.Updates(JdCookie{
 										WsKey: ck.WsKey,
 									})
+									if sender.IsQQ() {
+										ck.Update(QQ, ck.QQ)
+									}
 									msg := fmt.Sprintf("写入WsKey，并更新账号%s", ck.PtPin)
+									sender.Reply(fmt.Sprintf(msg))
 									(&JdCookie{}).Push(msg)
 									logs.Info(msg)
 								} else {
@@ -131,7 +136,7 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 										nck.Updates(JdCookie{
 											WsKey: ck.WsKey,
 										})
-										msg := fmt.Sprintf("写入WsKey，并更新账号%s", ck.PtPin)
+										msg := fmt.Sprintf("更新WsKey，并更新账号%s", ck.PtPin)
 										sender.Reply(fmt.Sprintf(msg))
 										(&JdCookie{}).Push(msg)
 										logs.Info(msg)
@@ -140,6 +145,9 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 							} else {
 								NewJdCookie(&ck)
 								msg := fmt.Sprintf("添加账号，用户名：%s", ck.PtPin)
+								if sender.IsQQ() {
+									ck.Update(QQ, ck.QQ)
+								}
 								sender.Reply(fmt.Sprintf(msg))
 								logs.Info(msg)
 							}

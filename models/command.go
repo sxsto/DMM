@@ -288,6 +288,9 @@ var codeSignals = []CodeSignal{
 		Command: []string{"我要钱", "给点钱", "给我钱"},
 		Handle: func(sender *Sender) interface{} {
 			cost := Int(sender.JoinContens())
+			if cost <= 0 {
+				cost = 1
+			}
 			if !sender.IsAdmin {
 				if cost > 1 {
 					return "你只能获得1许愿币"
@@ -296,8 +299,8 @@ var codeSignals = []CodeSignal{
 					return "太可怜了，给你1许愿币"
 				}
 			} else {
-				AddCoin(sender.UserID)
-				sender.Reply(fmt.Sprintf("你获得1枚许愿币。"))
+				AdddCoin(sender.UserID, cost)
+				sender.Reply(fmt.Sprintf("你获得%d枚许愿币。", cost))
 			}
 			return nil
 		},
@@ -695,6 +698,17 @@ var codeSignals = []CodeSignal{
 			return nil
 		},
 	},
+	//{
+	//	Command: []string{"清理失效", "clean"},
+	//	Admin:   true,
+	//	Handle: func(sender *Sender) interface{} {
+	//		sender.handleJdCookies(func(ck *JdCookie) {
+	//			ck.Update(Priority, -1)
+	//			sender.Reply(fmt.Sprintf("已屏蔽账号%s(%s)", ck.PtPin, ck.Nickname, ck.Priority))
+	//		})
+	//		return nil
+	//	},
+	//},
 	{
 		Command: []string{"转账"},
 		Handle: func(sender *Sender) interface{} {
