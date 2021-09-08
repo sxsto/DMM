@@ -550,7 +550,8 @@ func (c *Container) postConfig(handle func(config string) string) error {
 }
 
 func (c *Container) getSession() error {
-	req := httplib.Post(c.Address + "/api/auth")
+	req := httplib.Post(c.Address + "/auth") //旧版V4
+	// req := httplib.Post(c.Address + "/api/auth") //兼容新版V4
 	req.Param("username", c.Username)
 	req.Param("password", c.Password)
 	rsp, err := req.Response()
