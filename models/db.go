@@ -43,6 +43,7 @@ func initDB() {
 		&Env{},
 		&Wish{},
 		&Token{},
+		&UserAdmin{},
 	)
 	keys = make(map[string]bool)
 	pins = make(map[string]bool)
@@ -130,6 +131,7 @@ var Available = "Available"
 var UnAvailable = "UnAvailable"
 var PtKey = "PtKey"
 var PtPin = "PtPin"
+var Content = "Content"
 var WsKey = "WsKey"
 var Address = "Address"
 var Priority = "Priority"

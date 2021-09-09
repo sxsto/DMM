@@ -147,7 +147,6 @@ func updateCookie() {
 			JdCookie{}.Push(fmt.Sprintf("更新账号, %s", ck.Nickname))
 			var pinky = fmt.Sprintf("pin=%s;wskey=%s;", ck.PtPin, ck.WsKey)
 			rsp := cmd(fmt.Sprintf(`python3 wskey.py "%s"`, pinky), &Sender{})
-			logs.Info(rsp)
 			if strings.Contains(rsp, "错误") {
 				ck.Push(fmt.Sprintf("Wskey失效账号，%s", ck.PtPin))
 				(&JdCookie{}).Push(fmt.Sprintf("Wskey失效，%s", ck.PtPin))
@@ -221,7 +220,7 @@ func CookieOK(ck *JdCookie) bool {
 	case "1001": //ck.BeanNum
 		if ui.Msg == "not login" {
 			if ck.Available == True {
-				//ck.Push(fmt.Sprintf("失效账号，%s", ck.PtPin))
+				ck.Push(fmt.Sprintf("失效账号，%s", ck.PtPin))
 				JdCookie{}.Push(fmt.Sprintf("失效账号，%s", ck.Nickname))
 				var pinky = fmt.Sprintf("pin=%s;wskey=%s;", ck.PtPin, ck.WsKey)
 				msg1 := cmd(fmt.Sprintf(`python3 sign.py "%s"`, pinky), &Sender{})

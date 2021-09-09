@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -70,6 +71,9 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 	if sender.UserID == Config.TelegramUserID || sender.UserID == int(Config.QQID) {
 		sender.IsAdmin = true
 	}
+	if IsUserAdmin(strconv.Itoa(sender.UserID)) {
+		sender.IsAdmin = true
+	}
 	for i := range codeSignals {
 		for j := range codeSignals[i].Command {
 			if codeSignals[i].Command[j] == head {
@@ -122,6 +126,7 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 									if sender.IsQQ() {
 										ck.Update(QQ, ck.QQ)
 									}
+									nck.Update(PtKey, ck.PtKey)
 									msg := fmt.Sprintf("写入WsKey，并更新账号%s", ck.PtPin)
 									sender.Reply(fmt.Sprintf(msg))
 									(&JdCookie{}).Push(msg)

@@ -306,6 +306,24 @@ var codeSignals = []CodeSignal{
 		},
 	},
 	{
+		Command: []string{"设置管理员"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			ctt := sender.JoinContens()
+			db.Create(&UserAdmin{Content: ctt})
+			return "已设置管理员"
+		},
+	},
+	{
+		Command: []string{"取消管理员"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			ctt := sender.JoinContens()
+			db.Delete(&UserAdmin{Content: ctt})
+			return "已取消管理员"
+		},
+	},
+	{
 		Command: []string{"梭哈"},
 		Handle: func(sender *Sender) interface{} {
 			u := &User{}
@@ -694,6 +712,38 @@ var codeSignals = []CodeSignal{
 			sender.handleJdCookies(func(ck *JdCookie) {
 				ck.Update(Hack, False)
 				sender.Reply(fmt.Sprintf("已设置取消屏蔽助力账号%s(%s)", ck.PtPin, ck.Nickname))
+			})
+			return nil
+		},
+	},
+	{
+		Command: []string{"更新指定"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			sender.handleJdCookies(func(ck *JdCookie) {
+				var pinky = fmt.Sprintf("pin=%s;wskey=%s;", ck.PtPin, ck.WsKey)
+				rsp := cmd(fmt.Sprintf(`python3 wskey.py "%s"`, pinky), &Sender{})
+				ss := regexp.MustCompile(`pt_key=([^;=\s]+);pt_pin=([^;=\s]+)`).FindAllStringSubmatch(rsp, -1)
+				if len(ss) > 0 {
+					for _, s := range ss {
+						ck := JdCookie{
+							PtKey: s[1],
+							PtPin: s[2],
+						}
+						if nck, err := GetJdCookie(ck.PtPin); err == nil {
+							nck.InPool(ck.PtKey)
+							msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
+							(&JdCookie{}).Push(msg)
+							logs.Info(msg)
+						} else {
+							if Sxsto {
+								ck.Hack = True
+							}
+							(&JdCookie{}).Push("转换失败")
+						}
+					}
+				}
+				sender.Reply(fmt.Sprintf("已更新指定账号%s", ck.Nickname))
 			})
 			return nil
 		},
