@@ -4,7 +4,7 @@ go 1.17
 
 replace github.com/willf/bitset v1.2.0 => github.com/bits-and-blooms/bitset v1.2.0
 
-replace github.com/Mrs4s/go-cqhttp v1.0.0-beta6 => github.com/cdle/go-cqhttp v1.1.2
+replace github.com/Mrs4s/go-cqhttp v1.0.0-beta6 => github.com/cdle/go-cqhttp v2.2.2
 
 require (
 	github.com/Baozisoftware/qrcode-terminal-go v0.0.0-20170407111555-c0650d8dff0f
