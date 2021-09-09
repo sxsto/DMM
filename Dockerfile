@@ -1,4 +1,4 @@
-FROM whyour/qinglong:latest
+FROM sxsto/ql:latest
 
 # region 安装golang编译环境
 RUN apk add --no-cache \
@@ -6,7 +6,7 @@ RUN apk add --no-cache \
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.16.7
+ENV GOLANG_VERSION 1.17
 
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
