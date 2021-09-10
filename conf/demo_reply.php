@@ -29,6 +29,7 @@ return reply(
           `历史今天`=>`http://www.shengapi.cn/api/lsjt.php`
           `爱情话语`=>`http://www.shengapi.cn/api/qhyl.php`
           `伤感语录`=>`http://www.shengapi.cn/api/sgyl.php`
+          `人生话语`=>`http://www.shengapi.cn/api/rshy.php`
           `.*骚话.*`=>`https://api.vvhan.com/api/sao`
           `文明` => `http://api.btstu.cn/sjbz/zsy.php`
           `富强` => `http://api.btstu.cn/sjbz/?m_lx=suiji`
@@ -60,7 +61,7 @@ return reply(
        二次元图丨 网易热评 
        动漫头像丨 舔狗日记
        爱情话语丨 历史今天
-       伤感语录丨 
+       伤感语录丨 人生话语
        精神语录丨 毒鸡汤
        动漫台词丨 朋友圈文案       
        ———————————
