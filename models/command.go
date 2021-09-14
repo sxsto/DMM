@@ -164,6 +164,35 @@ var codeSignals = []CodeSignal{
 		},
 	},
 	{
+		Command: []string{"清零"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			sender.handleJdCookies(func(ck *JdCookie) {
+				ck.Update(Priority, 1)
+
+			})
+			sender.Reply("优先级已清零")
+			return nil
+		},
+	},
+	{
+		Command: []string{"更新优先级"},
+		Handle: func(sender *Sender) interface{} {
+			coin := GetCoin(sender.UserID)
+			t := time.Now()
+			if t.Weekday().String() == "Monday" {
+				sender.handleJdCookies(func(ck *JdCookie) {
+					ck.Update(Priority, coin)
+				})
+				sender.Reply("优先级已更新")
+				ClearCoin(sender.UserID)
+			} else {
+				sender.Reply("等周一再更新")
+			}
+			return nil
+		},
+	},
+	{
 		Command: []string{"qrcode", "扫码", "二维码", "scan"},
 		Handle: func(sender *Sender) interface{} {
 			// 暂时屏蔽扫码

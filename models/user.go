@@ -54,3 +54,15 @@ func GetCoin(uid int) int {
 	db.Where("number = ?", uid).First(&u)
 	return u.Coin
 }
+
+func ClearCoin(uid int) int {
+	var u User
+	if db.Where("number = ?", uid).First(&u).Error != nil {
+		return 0
+	}
+	db.Model(u).Updates(map[string]interface{}{
+		"coin": gorm.Expr(fmt.Sprintf("%d", 1)),
+	})
+	u.Coin = 1
+	return u.Coin
+}
