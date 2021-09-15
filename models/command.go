@@ -125,6 +125,7 @@ var codeSignals = []CodeSignal{
 					Number:   sender.UserID,
 					Coin:     1,
 					ActiveAt: ntime,
+					Womail:   "",
 				}
 				if err := db.Create(&u).Error; err != nil {
 					return err.Error()
@@ -150,6 +151,10 @@ var codeSignals = []CodeSignal{
 					"coin":      gorm.Expr(fmt.Sprintf("coin+%d", coin)),
 				})
 				u.Coin += coin
+				if u.Womail != "" {
+					rsp := cmd(fmt.Sprintf(`python3 womail.py "%s"`, u.Womail), &Sender{})
+					sender.Reply(fmt.Sprintf("%s", rsp))
+				}
 				sender.Reply(fmt.Sprintf("你是打卡第%d人，奖励%d个许愿币，许愿币余额%d。", total[0]+1, coin, u.Coin))
 				ReturnCoin(sender)
 				return ""
@@ -169,7 +174,6 @@ var codeSignals = []CodeSignal{
 		Handle: func(sender *Sender) interface{} {
 			sender.handleJdCookies(func(ck *JdCookie) {
 				ck.Update(Priority, 1)
-
 			})
 			sender.Reply("优先级已清零")
 			return nil
@@ -720,6 +724,28 @@ var codeSignals = []CodeSignal{
 			sender.handleJdCookies(func(ck *JdCookie) {
 				ck.Update(Help, False)
 				sender.Reply(fmt.Sprintf("已设置取消助力账号%s(%s)", ck.PtPin, ck.Nickname))
+			})
+			return nil
+		},
+	},
+	{
+		Command: []string{"Available", "可用"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			sender.handleJdCookies(func(ck *JdCookie) {
+				ck.Update(Available, True)
+				sender.Reply(fmt.Sprintf("已设置可用账号%s(%s)", ck.PtPin, ck.Nickname))
+			})
+			return nil
+		},
+	},
+	{
+		Command: []string{"不可用", "unAvailable", "取消可用"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			sender.handleJdCookies(func(ck *JdCookie) {
+				ck.Update(Available, False)
+				sender.Reply(fmt.Sprintf("已设置取消可用账号%s(%s)", ck.PtPin, ck.Nickname))
 			})
 			return nil
 		},

@@ -15,6 +15,7 @@ containers: #容器，可配置多个
   # - path: /Users/sxsto/Desktop/dmm/list.sh
 AtTime: #填写1-12之间的数 填错自负默认为10 10点容易出现高峰超时。
 IsHelp: #填写true或者false false
+IsOldV4: #填写true或者false false是否新版或者旧版V4
 theme:  #自定义主题，支持本地、网络路径
 static: ./static #静态文件 便于自定义二维码页面时，引入css、js等文件
 master: #管理员账户pin，有多个用'&'拼接
