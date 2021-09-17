@@ -6,7 +6,7 @@ RUN apk add --no-cache \
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.17.1
+ENV GOLANG_VERSION 1.17
 
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
