@@ -6,7 +6,7 @@ RUN apk add --no-cache \
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.17
+ENV GOLANG_VERSION 1.17.1
 
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
@@ -44,8 +44,8 @@ RUN set -eux; \
 	esac; \
 	\
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
-	url='https://dl.google.com/go/go1.17.src.tar.gz'; \
-	sha256='3a70e5055509f347c0fb831ca07a2bf3b531068f349b14a3c652e9b5b67beb5d'; \
+	url='https://dl.google.com/go/go1.17.1.src.tar.gz'; \
+	sha256='49dc08339770acd5613312db8c141eaf61779995577b89d93b541ef83067e5b1'; \
 	\
 	wget -O go.tgz.asc "$url.asc"; \
 	wget -O go.tgz "$url"; \
