@@ -101,7 +101,9 @@ RUN go env
 RUN set -eux; \
     sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
     && apk update \
-    && apk add --no-cache --virtual .build-deps bash git build-base
+    && apk add --no-cache --virtual .build-deps bash git build-base tzdata \
+	&& ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo "Asia/Shanghai" > /etc/timezone
 
 # fix /ql/shell/share.sh: line 311: /ql/log/task_error.log: No such file or directory
 RUN mkdir -p /root/dmm
