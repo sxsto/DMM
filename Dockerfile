@@ -1,4 +1,4 @@
-FROM sxsto/ql:latest
+FROM node:lts-alpine3.14
 
 # region 安装golang编译环境
 RUN apk add --no-cache \
@@ -97,13 +97,6 @@ ENV GO111MODULE on
 ENV GOPROXY https://goproxy.cn
 RUN go env
 
-# endregion
-
-ARG QL_VERSION
-
-LABEL maintainer="sm <sm@gmail.com>"
-LABEL qinglong_version="${QL_VERSION}"
-
 # 安装必要
 RUN set -eux; \
     sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
@@ -111,19 +104,15 @@ RUN set -eux; \
     && apk add --no-cache --virtual .build-deps bash git build-base
 
 # fix /ql/shell/share.sh: line 311: /ql/log/task_error.log: No such file or directory
-RUN mkdir -p /ql/dmm \
-    && mkdir -p /ql/log \
-    && echo "" > /ql/log/task_error.log
+RUN mkdir -p /root/dmm
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 # 初始化生成目录 && fix "permission denied: unknown"
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# 青龙默认端口
-EXPOSE 5700
 # dmm默认端口
 EXPOSE 5701
 
-VOLUME /ql/dmm
+VOLUME /root/dmm
 
 ENTRYPOINT ["docker-entrypoint.sh"]
