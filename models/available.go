@@ -171,9 +171,10 @@ func updateCookie() {
 				if nck, err := GetJdCookie(ck.PtPin); err == nil {
 					xx++
 					nck.InPool(ck.PtKey)
-					//msg := fmt.Sprintf("定时更新账号，%s", ck.PtPin)
+					nck.Update(Available, True)
+					msg := fmt.Sprintf("定时更新账号，%s", ck.PtPin)
 					//不再发送成功提醒
-					//(&JdCookie{}).Push(msg)
+					(&JdCookie{}).Push(msg)
 					//logs.Info(msg)
 				} else {
 					yy++
@@ -217,7 +218,8 @@ func CookieOK(ck *JdCookie) bool {
 	case "1001": //ck.BeanNum
 		if ui.Msg == "not login" {
 			if ck.Available == True {
-				ck.Update(Available, False)
+				// ck.Update(Available, False)
+				logs.Info(ck.Available)
 				if Config.Wskey {
 					if len(ck.WsKey) > 0 {
 						var pinky = fmt.Sprintf("pin=%s;wskey=%s;", ck.PtPin, ck.WsKey)
@@ -225,7 +227,7 @@ func CookieOK(ck *JdCookie) bool {
 						JdCookie{}.Push(fmt.Sprintf("自动转换wskey---%s", msg))
 						//缺少错误判断
 						if strings.Contains(msg, "错误") {
-							ck.Push(fmt.Sprintf("Wskey失效账号，%s", ck.PtPin))
+							// ck.Push(fmt.Sprintf("Wskey失效账号，%s", ck.PtPin))
 							(&JdCookie{}).Push(fmt.Sprintf("Wskey失效，%s", ck.PtPin))
 						} else {
 							ptKey := FetchJdCookieValue("pt_key", msg)
@@ -241,7 +243,7 @@ func CookieOK(ck *JdCookie) bool {
 								(&JdCookie{}).Push(msg)
 								logs.Info(msg)
 							} else {
-								nck.Update(Available, False)
+								// nck.Update(Available, False)
 								(&JdCookie{}).Push(fmt.Sprintf("转换失败，%s", nck.PtPin))
 							}
 						}
