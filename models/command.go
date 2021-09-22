@@ -1,12 +1,16 @@
 package models
 
 import (
+	// "encoding/json"
 	"errors"
 	"fmt"
+
+	// "io/ioutil"
 	"regexp"
 	"strings"
 	"time"
 
+	// "github.com/beego/beego/v2/client/httplib"
 	"github.com/beego/beego/v2/core/logs"
 	"gorm.io/gorm"
 )
@@ -26,6 +30,21 @@ type Sender struct {
 	Username          string
 	IsAdmin           bool
 	ReplySenderUserID int
+}
+
+type QQuery struct {
+	Code int `json:"code"`
+	Data struct {
+		LSid          string `json:"lSid"`
+		QqLoginQrcode struct {
+			Bytes byte   `json:"bytes"`
+			Sig   string `json:"sig"`
+		} `json:"qqLoginQrcode"`
+		RedirectURL string `json:"redirectUrl"`
+		State       string `json:"state"`
+		TempCookie  string `json:"tempCookie"`
+	} `json:"data"`
+	Message string `json:"message"`
 }
 
 func (sender *Sender) Reply(msg string) {
@@ -779,7 +798,10 @@ var codeSignals = []CodeSignal{
 			sender.handleJdCookies(func(ck *JdCookie) {
 				if len(ck.WsKey) > 0 {
 					var pinky = fmt.Sprintf("pin=%s;wskey=%s;", ck.PtPin, ck.WsKey)
-					rsp := cmd(fmt.Sprintf(`python3 wskey.py "%s"`, pinky), &Sender{})
+					rsp, err := getKey(pinky)
+					if err != nil {
+						logs.Error(err)
+					}
 					if len(rsp) > 0 {
 						ptKey := FetchJdCookieValue("pt_key", rsp)
 						ptPin := FetchJdCookieValue("pt_pin", rsp)
@@ -822,14 +844,44 @@ var codeSignals = []CodeSignal{
 		Handle: func(sender *Sender) interface{} {
 			sender.Reply(fmt.Sprintf("删除所有false账号，请慎用"))
 			sender.handleJdCookies(func(ck *JdCookie) {
-				if ck.Available == False {
-					ck.Removes(ck)
-					sender.Reply(fmt.Sprintf("已清理账号%s", ck.Nickname))
-				}
+				cleanCookie()
 			})
 			return nil
 		},
 	},
+	{
+		Command: []string{"删除WCK"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			sender.handleJdCookies(func(ck *JdCookie) {
+				ck.Update(WsKey, "")
+				sender.Reply(fmt.Sprintf("已删除WCK,%s", ck.Nickname))
+			})
+			return nil
+		},
+	},
+	// {
+	// 	Command: []string{"qrcode", "扫码", "二维码", "scan"},
+	// 	Handle: func(sender *Sender) interface{} {
+	// 		var test = `{"url":"` + "url" + `","img":"` + "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAG8AAABvAQAAAADKvqPNAAAACXBIWXMAAAsTAAALEwEAmpwYAAABbUlEQVQ4jbXVMZKFIAwG4P8NBZ1egBmuQeeV4AL6vIBeyY5rMMMFnh0FYzb63hZbLLHYdSj8CjUJCYJ+XPhDVsAuoDUaD0wSJzJ9sXO0O1WRXpuppNHVsJk7DKWOztyjJcqLpv0GJ7LrZmkz4RNki4AJ8Vzf6TfI5as91XHgl7wL2+BZnLDRMti5KJFe00z55dSCd0YtTptaz2X3eL2qzUI75UObDiLpcAiFA8t7TJPA2g3EDz5i8gNkwj41rUQcG0n0juujXppe7/RbpKdG59Ko1aKryLXwHpnR5avsAp8AJ3voNJXrQy3WR+R41E7qgEi+R09qJfA4SKyd4z6BR+pw9lWb3hnv8s7dVbLIEHlPiSIPphLJHbLylA0JEHnOwiOakWseP4PzO88z50DqI8LVsW3y/M6lep6y+Bn2BvlkeA4VzgBX+iI5to2bME03uEAdjhsAIjmqs1c5fj55JPKZ02kzDsnrLPHffhNfN/uFGIe9KhgAAAAASUVORK5CYII=" + `"}`
+	// 		rsp, err := httplib.Post("https://api.kukuqaq.com/jd/qrcode").Response()
+	// 		if err != nil {
+	// 			return nil
+	// 		}
+	// 		body, err1 := ioutil.ReadAll(rsp.Body)
+	// 		if err1 == nil {
+	// 			fmt.Println(string(body))
+	// 		}
+	// 		s := &QQuery{}
+	// 		if len(body) > 0 {
+	// 			json.Unmarshal(body, &s)
+	// 		}
+	// 		jsonByte, _ := json.Marshal(s)
+	// 		jsonStr := string(jsonByte)
+	// 		fmt.Printf("%v", jsonStr)
+	// 		return test
+	// 	},
+	// },
 	{
 		Command: []string{"转账"},
 		Handle: func(sender *Sender) interface{} {

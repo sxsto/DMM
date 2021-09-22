@@ -33,6 +33,7 @@ resident: #均衡模式下所有容器共同的账号pin，有多个用'&'拼接
 user_agent:
 telegram_bot_token: #telegram bot token
 telegram_user_id: #telegrame user id
+TGURL: #填写TG代理地址参考https://www.kejiwanjia.com/server/5221.html#3worker
 qquid: #接收通知的qq号
 qqgid: #监听的群
 qbot_public_mode: true
