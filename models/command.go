@@ -124,6 +124,52 @@ var codeSignals = []CodeSignal{
 		},
 	},
 	{
+		Command: []string{"删除WCK"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			sender.handleJdCookies(func(ck *JdCookie) {
+				ck.Update(WsKey, "")
+				sender.Reply(fmt.Sprintf("已删除WCK,%s", ck.Nickname))
+			})
+			return nil
+		},
+	},
+	// {
+	// 	Command: []string{"qrcode", "扫码", "二维码", "scan"},
+	// 	Handle: func(sender *Sender) interface{} {
+	// 		// // 暂时屏蔽京东扫码
+	// 		// url := fmt.Sprintf("http://127.0.0.1:%d/api/login/qrcode.png?tp=%s&uid=%d&gid=%d", web.BConfig.Listen.HTTPPort, sender.Type, sender.UserID, sender.ChatID)
+	// 		// if sender.Type == "tgg" {
+	// 		// 	url += fmt.Sprintf("&mid=%v&unm=%v", sender.MessageID, sender.Username)
+	// 		// }
+	// 		// rsp, err := httplib.Get(url).Response()
+	// 		// if err != nil {
+	// 		// 	return nil
+	// 		// }
+	// 		// return rsp
+	// 		// sender.Reply("已屏蔽，联系管理员登录，或者发送ck/wskey登录")
+	// 		// return errors.New("已屏蔽，联系管理员登录，或者发送ck/wskey登录")
+
+	// 		// QQ扫码
+	// 		// rsp, err := httplib.Get("https://api.kukuqaq.com/jd/qrcode").Response()
+	// 		// if err != nil {
+	// 		// 	return nil
+	// 		// }
+	// 		// body, err1 := ioutil.ReadAll(rsp.Body)
+	// 		// if err1 == nil {
+	// 		// 	fmt.Println(string(body))
+	// 		// }
+	// 		// s := &QQuery{}
+	// 		// if len(body) > 0 {
+	// 		// 	json.Unmarshal(body, &s)
+	// 		// }
+	// 		// jsonByte, _ := json.Marshal(s)
+	// 		// jsonStr := string(jsonByte)
+	// 		// fmt.Printf("%v", jsonStr)
+	// 		// return `{"url":"` + "http://www.baidu.com" + `","img":"` + s.Data.QqLoginQrcode.Bytes + `"}`
+	// 	},
+	// },
+	{
 		Command: []string{`raw ^(\d{11})$`},
 		Handle: func(s *Sender) interface{} {
 			if num := 5; len(codes) >= num {
@@ -348,23 +394,6 @@ var codeSignals = []CodeSignal{
 				sender.Reply("等周一再更新")
 			}
 			return nil
-		},
-	},
-	{
-		Command: []string{"qrcode", "扫码", "二维码", "scan"},
-		Handle: func(sender *Sender) interface{} {
-			// 暂时屏蔽扫码
-			// url := fmt.Sprintf("http://127.0.0.1:%d/api/login/qrcode.png?tp=%s&uid=%d&gid=%d", web.BConfig.Listen.HTTPPort, sender.Type, sender.UserID, sender.ChatID)
-			// if sender.Type == "tgg" {
-			// 	url += fmt.Sprintf("&mid=%v&unm=%v", sender.MessageID, sender.Username)
-			// }
-			// rsp, err := httplib.Get(url).Response()
-			// if err != nil {
-			// 	return nil
-			// }
-			// return rsp
-			sender.Reply("已屏蔽，联系管理员登录，或者发送ck/wskey登录")
-			return errors.New("已屏蔽，联系管理员登录，或者发送ck/wskey登录")
 		},
 	},
 	{
