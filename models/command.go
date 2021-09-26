@@ -379,23 +379,23 @@ var codeSignals = []CodeSignal{
 			return nil
 		},
 	},
-	{
-		Command: []string{"更新优先级"},
-		Handle: func(sender *Sender) interface{} {
-			coin := GetCoin(sender.UserID)
-			t := time.Now()
-			if t.Weekday().String() == "Monday" {
-				sender.handleJdCookies(func(ck *JdCookie) {
-					ck.Update(Priority, coin)
-				})
-				sender.Reply("优先级已更新")
-				ClearCoin(sender.UserID)
-			} else {
-				sender.Reply("等周一再更新")
-			}
-			return nil
-		},
-	},
+	// {
+	// 	Command: []string{"更新优先级"},
+	// 	Handle: func(sender *Sender) interface{} {
+	// 		coin := GetCoin(sender.UserID)
+	// 		t := time.Now()
+	// 		if t.Weekday().String() == "Monday" {
+	// 			sender.handleJdCookies(func(ck *JdCookie) {
+	// 				ck.Update(Priority, coin)
+	// 			})
+	// 			sender.Reply("优先级已更新")
+	// 			ClearCoin(sender.UserID)
+	// 		} else {
+	// 			sender.Reply("等周一再更新")
+	// 		}
+	// 		return nil
+	// 	},
+	// },
 	{
 		Command: []string{"升级", "更新", "update", "upgrade"},
 		Admin:   true,
