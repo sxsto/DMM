@@ -501,27 +501,6 @@ var codeSignals = []CodeSignal{
 			return nil
 		},
 	},
-	{ //娱乐
-		Command: []string{"我要钱", "给点钱", "给我钱"},
-		Handle: func(sender *Sender) interface{} {
-			cost := Int(sender.JoinContens())
-			if cost <= 0 {
-				cost = 1
-			}
-			if !sender.IsAdmin {
-				if cost > 1 {
-					return "你只能获得1许愿币"
-				} else {
-					AddCoin(sender.UserID)
-					return "太可怜了，给你1许愿币"
-				}
-			} else {
-				AdddCoin(sender.UserID, cost)
-				sender.Reply(fmt.Sprintf("你获得%d枚许愿币。", cost))
-			}
-			return nil
-		},
-	},
 	{
 		Command: []string{"设置管理员"},
 		Admin:   true,
@@ -540,45 +519,68 @@ var codeSignals = []CodeSignal{
 			return "已取消管理员"
 		},
 	},
-	{
-		Command: []string{"梭哈"},
-		Handle: func(sender *Sender) interface{} {
-			u := &User{}
-			cost := GetCoin(sender.UserID)
-
-			if cost <= 0 || cost > 10000 {
-				cost = 1
-			}
-
-			if err := db.Where("number = ?", sender.UserID).First(u).Error; err != nil || u.Coin < cost {
-				return "许愿币不足，先去打卡吧。"
-			} else {
-				sender.Reply(fmt.Sprintf("你使用%d枚许愿币。", cost))
-			}
-			baga := 0
-			if u.Coin > 100000 {
-				baga = u.Coin
-				cost = u.Coin
-			}
-			r := time.Now().Nanosecond() % 10
-			if r < 7 || baga > 0 {
-				sender.Reply(fmt.Sprintf("很遗憾你失去了%d枚许愿币。", cost))
-				cost = -cost
-			} else {
-				if r == 9 {
-					cost *= 4
-					sender.Reply(fmt.Sprintf("恭喜你4倍暴击获得%d枚许愿币，20秒后自动转入余额。", cost))
-					time.Sleep(time.Second * 20)
-				} else {
-					sender.Reply(fmt.Sprintf("很幸运你获得%d枚许愿币，10秒后自动转入余额。", cost))
-					time.Sleep(time.Second * 10)
+	/*
+		{ //娱乐
+			Command: []string{"我要钱", "给点钱", "给我钱"},
+			Handle: func(sender *Sender) interface{} {
+				cost := Int(sender.JoinContens())
+				if cost <= 0 {
+					cost = 1
 				}
-				sender.Reply(fmt.Sprintf("%d枚许愿币已到账。", cost))
-			}
-			db.Model(u).Update("coin", gorm.Expr(fmt.Sprintf("coin + %d", cost)))
-			return nil
+				if !sender.IsAdmin {
+					if cost > 1 {
+						return "你只能获得1许愿币"
+					} else {
+						AddCoin(sender.UserID)
+						return "太可怜了，给你1许愿币"
+					}
+				} else {
+					AdddCoin(sender.UserID, cost)
+					sender.Reply(fmt.Sprintf("你获得%d枚许愿币。", cost))
+				}
+				return nil
+			},
 		},
-	},
+		{
+			Command: []string{"梭哈"},
+			Handle: func(sender *Sender) interface{} {
+				u := &User{}
+				cost := GetCoin(sender.UserID)
+
+				if cost <= 0 || cost > 10000 {
+					cost = 1
+				}
+
+				if err := db.Where("number = ?", sender.UserID).First(u).Error; err != nil || u.Coin < cost {
+					return "许愿币不足，先去打卡吧。"
+				} else {
+					sender.Reply(fmt.Sprintf("你使用%d枚许愿币。", cost))
+				}
+				baga := 0
+				if u.Coin > 100000 {
+					baga = u.Coin
+					cost = u.Coin
+				}
+				r := time.Now().Nanosecond() % 10
+				if r < 7 || baga > 0 {
+					sender.Reply(fmt.Sprintf("很遗憾你失去了%d枚许愿币。", cost))
+					cost = -cost
+				} else {
+					if r == 9 {
+						cost *= 4
+						sender.Reply(fmt.Sprintf("恭喜你4倍暴击获得%d枚许愿币，20秒后自动转入余额。", cost))
+						time.Sleep(time.Second * 20)
+					} else {
+						sender.Reply(fmt.Sprintf("很幸运你获得%d枚许愿币，10秒后自动转入余额。", cost))
+						time.Sleep(time.Second * 10)
+					}
+					sender.Reply(fmt.Sprintf("%d枚许愿币已到账。", cost))
+				}
+				db.Model(u).Update("coin", gorm.Expr(fmt.Sprintf("coin + %d", cost)))
+				return nil
+			},
+		},
+	*/
 	{
 		Command: []string{"翻翻乐"},
 		Handle: func(sender *Sender) interface{} {
