@@ -1,6 +1,9 @@
 package models
 
 import (
+	"math/rand"
+	"strconv"
+
 	"github.com/beego/beego/v2/adapter/logs"
 	"github.com/robfig/cron/v3"
 )
@@ -18,6 +21,8 @@ func initCron() {
 		}
 		c.AddFunc("3 */1 * * *", initVersion)
 		c.AddFunc("40 */1 * * *", GitPullAll)
+		//12小时cookie过期禁用检测 需要配置Ctime 随机分钟数
+		c.AddFunc("0 "+strconv.Itoa(rand.Intn(59))+" "+Config.CTime+"/12 * * ?", initCookie)
 
 	}
 	c.Start()
