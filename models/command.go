@@ -7,7 +7,6 @@ import (
 
 	// "io/ioutil"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -124,6 +123,14 @@ var codeSignals = []CodeSignal{
 		},
 	},
 	{
+		Command: []string{"清空WCK"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			cleanWck()
+			return nil
+		},
+	},
+	{
 		Command: []string{"删除WCK"},
 		Admin:   true,
 		Handle: func(sender *Sender) interface{} {
@@ -169,140 +176,6 @@ var codeSignals = []CodeSignal{
 	// 		// return `{"url":"` + "http://www.baidu.com" + `","img":"` + s.Data.QqLoginQrcode.Bytes + `"}`
 	// 	},
 	// },
-	{
-		Command: []string{`raw ^(\d{11})$`},
-		Handle: func(s *Sender) interface{} {
-			if num := 5; len(codes) >= num {
-				return fmt.Sprintf("%v坑位全部在使用中，请排队。", num)
-			}
-			id := "qq" + strconv.Itoa(s.UserID)
-			if _, ok := codes[id]; ok {
-				return "你已在登录中。"
-			}
-			go func() {
-				c := make(chan string, 1)
-				codes[id] = c
-				defer delete(codes, id)
-				var sess = new(Session)
-				phone := s.Contents[0]
-				logs.Info(phone)
-				s.Reply("请稍后，正在模拟环境...")
-				if err := sess.Phone(phone); err != nil {
-					s.Reply(err.Error())
-					return
-				}
-				send := false
-				login := false
-				verify := false
-				success := false
-				sms_code := ""
-				for {
-					query, _ := sess.query()
-					if query.PageStatus == "SESSION_EXPIRED" {
-						s.Reply("登录超时")
-						return
-					}
-					if query.SessionTimeOut == 0 {
-						if success {
-							return
-						}
-						s.Reply("登录超时")
-						return
-					}
-					if query.CanClickLogin && !login {
-						s.Reply("正在登录...")
-						if err := sess.login(phone, sms_code); err != nil {
-							s.Reply(err.Error())
-							return
-						}
-					}
-					if query.PageStatus == "VERIFY_FAILED_MAX" {
-						s.Reply("验证码错误次数过多，请重新获取。")
-						return
-					}
-					if query.PageStatus == "VERIFY_CODE_MAX" {
-						s.Reply("对不起，短信验证码请求频繁，请稍后再试。")
-						return
-					}
-					if query.PageStatus == "REQUIRE_VERIFY" && !verify {
-						verify = true
-						s.Reply("正在自动验证...")
-						if err := sess.crackCaptcha(); err != nil {
-							s.Reply(err.Error())
-							return
-						}
-						s.Reply("验证通过。")
-						s.Reply("请输入验证码______")
-						select {
-						case sms_code = <-c:
-							s.Reply("正在提交验证码...")
-							if err := sess.SmsCode(sms_code); err != nil {
-								s.Reply(err.Error())
-								return
-							}
-							s.Reply("验证码提交成功。")
-						case <-time.After(60 * time.Second):
-							s.Reply("验证码超时。")
-							return
-
-						}
-					}
-					if query.CanSendAuth && !send {
-						if err := sess.sendAuthCode(); err != nil {
-							s.Reply(err.Error())
-							return
-						}
-						send = true
-					}
-					if !query.CanSendAuth && query.AuthCodeCountDown > 0 {
-
-					}
-					if query.AuthCodeCountDown == -1 && send {
-
-					}
-					if query.PageStatus == "SUCCESS_CK" && !success {
-						//Sender <- &Faker{
-						//	Message: fmt.Sprintf("pt_key=%v;pt_pin=%v;", query.Ck.PtKey, query.Ck.PtPin),
-						//	UserID:  s.GetUserID(),
-						//	Type:    s.GetImType(),
-						//}
-						s.Reply(fmt.Sprintf("登录成功，%v秒后可以登录下一个账号。", query.SessionTimeOut))
-						success = true
-					}
-					time.Sleep(time.Second)
-				}
-			}()
-
-			return nil
-		},
-	},
-	{
-		Command: []string{"登录", "登陆"},
-		Handle: func(s *Sender) interface{} {
-			logs.Info("进入流程")
-			if num := 5; len(codes) >= num {
-				return fmt.Sprintf("%v坑位全部在使用中，请排队(稍后再试)。", num)
-			}
-			id := "qq" + strconv.Itoa(s.UserID)
-			if _, ok := codes[id]; ok {
-				return "你已在登录中。"
-			}
-			s.Reply("请输入手机号___________")
-			return nil
-		},
-	},
-	{
-		Command: []string{`raw ^(\d{6})$`},
-		Handle: func(s *Sender) interface{} {
-			if code, ok := codes["qq"+fmt.Sprint(s.UserID)]; ok {
-				//code <- s.Get()
-				logs.Info(code)
-			} else {
-				s.Reply("验证码不存在或过期了，请重新登录。")
-			}
-			return nil
-		},
-	},
 	{
 		Command: []string{"sign", "打卡", "签到"},
 		Handle: func(sender *Sender) interface{} {
@@ -379,23 +252,6 @@ var codeSignals = []CodeSignal{
 			return nil
 		},
 	},
-	// {
-	// 	Command: []string{"更新优先级"},
-	// 	Handle: func(sender *Sender) interface{} {
-	// 		coin := GetCoin(sender.UserID)
-	// 		t := time.Now()
-	// 		if t.Weekday().String() == "Monday" {
-	// 			sender.handleJdCookies(func(ck *JdCookie) {
-	// 				ck.Update(Priority, coin)
-	// 			})
-	// 			sender.Reply("优先级已更新")
-	// 			ClearCoin(sender.UserID)
-	// 		} else {
-	// 			sender.Reply("等周一再更新")
-	// 		}
-	// 		return nil
-	// 	},
-	// },
 	{
 		Command: []string{"升级", "更新", "update", "upgrade"},
 		Admin:   true,
@@ -466,20 +322,40 @@ var codeSignals = []CodeSignal{
 	},
 	{
 		Command: []string{"查询", "query"},
-		Admin:   true,
 		Handle: func(sender *Sender) interface{} {
-			sender.handleJdCookies(func(ck *JdCookie) {
-				sender.Reply(ck.Query())
-			})
+			if sender.IsAdmin {
+				sender.handleJdCookies(func(ck *JdCookie) {
+					sender.Reply(ck.Query())
+				})
+			} else {
+				if getLimit(sender.UserID, 1) {
+					sender.handleJdCookies(func(ck *JdCookie) {
+						sender.Reply(ck.Query())
+					})
+				} else {
+					sender.Reply(fmt.Sprintf("鉴于东哥对接口限流，为了不影响大家的任务正常运行，即日起每日限流%d次，已超过今日限制", Config.Lim))
+				}
+			}
+
 			return nil
 		},
 	},
 	{
 		Command: []string{"详细查询", "query"},
 		Handle: func(sender *Sender) interface{} {
-			sender.handleJdCookies(func(ck *JdCookie) {
-				sender.Reply(ck.Query1())
-			})
+			if sender.IsAdmin {
+				sender.handleJdCookies(func(ck *JdCookie) {
+					sender.Reply(ck.Query1())
+				})
+			} else {
+				if getLimit(sender.UserID, 1) {
+					sender.handleJdCookies(func(ck *JdCookie) {
+						sender.Reply(ck.Query1())
+					})
+				} else {
+					sender.Reply(fmt.Sprintf("鉴于东哥对接口限流，为了不影响大家的任务正常运行，即日起每日限流%d次，已超过今日限制", Config.Lim))
+				}
+			}
 			return nil
 		},
 	},
@@ -517,192 +393,6 @@ var codeSignals = []CodeSignal{
 			ctt := sender.JoinContens()
 			RemoveUserAdmin(ctt)
 			return "已取消管理员"
-		},
-	},
-	/*
-		{ //娱乐
-			Command: []string{"我要钱", "给点钱", "给我钱"},
-			Handle: func(sender *Sender) interface{} {
-				cost := Int(sender.JoinContens())
-				if cost <= 0 {
-					cost = 1
-				}
-				if !sender.IsAdmin {
-					if cost > 1 {
-						return "你只能获得1许愿币"
-					} else {
-						AddCoin(sender.UserID)
-						return "太可怜了，给你1许愿币"
-					}
-				} else {
-					AdddCoin(sender.UserID, cost)
-					sender.Reply(fmt.Sprintf("你获得%d枚许愿币。", cost))
-				}
-				return nil
-			},
-		},
-		{
-			Command: []string{"梭哈"},
-			Handle: func(sender *Sender) interface{} {
-				u := &User{}
-				cost := GetCoin(sender.UserID)
-
-				if cost <= 0 || cost > 10000 {
-					cost = 1
-				}
-
-				if err := db.Where("number = ?", sender.UserID).First(u).Error; err != nil || u.Coin < cost {
-					return "许愿币不足，先去打卡吧。"
-				} else {
-					sender.Reply(fmt.Sprintf("你使用%d枚许愿币。", cost))
-				}
-				baga := 0
-				if u.Coin > 100000 {
-					baga = u.Coin
-					cost = u.Coin
-				}
-				r := time.Now().Nanosecond() % 10
-				if r < 7 || baga > 0 {
-					sender.Reply(fmt.Sprintf("很遗憾你失去了%d枚许愿币。", cost))
-					cost = -cost
-				} else {
-					if r == 9 {
-						cost *= 4
-						sender.Reply(fmt.Sprintf("恭喜你4倍暴击获得%d枚许愿币，20秒后自动转入余额。", cost))
-						time.Sleep(time.Second * 20)
-					} else {
-						sender.Reply(fmt.Sprintf("很幸运你获得%d枚许愿币，10秒后自动转入余额。", cost))
-						time.Sleep(time.Second * 10)
-					}
-					sender.Reply(fmt.Sprintf("%d枚许愿币已到账。", cost))
-				}
-				db.Model(u).Update("coin", gorm.Expr(fmt.Sprintf("coin + %d", cost)))
-				return nil
-			},
-		},
-	*/
-	{
-		Command: []string{"翻翻乐"},
-		Handle: func(sender *Sender) interface{} {
-			cost := Int(sender.JoinContens())
-			if cost <= 0 || cost > 10000 {
-				cost = 1
-			}
-			u := &User{}
-			if err := db.Where("number = ?", sender.UserID).First(u).Error; err != nil || u.Coin < cost {
-				return "许愿币不足，先去打卡吧。"
-			}
-			baga := 0
-			if u.Coin > 100000 {
-				baga = u.Coin
-				cost = u.Coin
-			}
-			r := time.Now().Nanosecond() % 10
-			if r < 5 || baga > 0 {
-				sender.Reply(fmt.Sprintf("很遗憾你失去了%d枚许愿币。", cost))
-				cost = -cost
-			} else {
-				if r == 9 {
-					cost *= 2
-					sender.Reply(fmt.Sprintf("恭喜你幸运暴击获得%d枚许愿币，20秒后自动转入余额。", cost))
-					time.Sleep(time.Second * 20)
-				} else {
-					sender.Reply(fmt.Sprintf("很幸运你获得%d枚许愿币，10秒后自动转入余额。", cost))
-					time.Sleep(time.Second * 10)
-				}
-				sender.Reply(fmt.Sprintf("%d枚许愿币已到账。", cost))
-			}
-			db.Model(u).Update("coin", gorm.Expr(fmt.Sprintf("coin + %d", cost)))
-			return nil
-		},
-	},
-	{
-		Command: []string{"许愿", "愿望", "wish", "hope", "want"},
-		Handle: func(sender *Sender) interface{} {
-			ct := sender.JoinContens()
-			if ct == "" {
-				rt := []string{}
-				ws := []Wish{}
-				tb := db
-				if !sender.IsAdmin {
-					tb = tb.Where("user_number", sender.UserID)
-				} else {
-					tb = tb.Where("status != 1")
-				}
-				tb.Order("id asc").Find(&ws)
-				if len(ws) == 0 {
-					return "请对我说 许愿 巴拉巴拉"
-				}
-				for i, w := range ws {
-					status := "未达成"
-					if w.Status == 1 {
-						status = "已撤销"
-					} else if w.Status == 2 {
-						status = "已达成"
-					}
-					id := i + 1
-					if sender.IsAdmin {
-						id = w.ID
-					}
-					rt = append(rt, fmt.Sprintf("%d. %s [%s]", id, w.Content, status))
-				}
-				return strings.Join(rt, "\n")
-			}
-			cost := 88
-			if sender.IsAdmin {
-				cost = 1
-			}
-			tx := db.Begin()
-			u := &User{}
-			if err := tx.Where("number = ?", sender.UserID).First(u).Error; err != nil {
-				tx.Rollback()
-				return "许愿币不足，先去打卡吧。"
-			}
-			w := &Wish{
-				Content:    ct,
-				Coin:       cost,
-				UserNumber: sender.UserID,
-			}
-			if u.Coin < cost {
-				tx.Rollback()
-				return fmt.Sprintf("许愿币不足，需要%d个许愿币。", cost)
-			}
-			if err := tx.Create(w).Error; err != nil {
-				tx.Rollback()
-				return err.Error()
-			}
-			if tx.Model(u).Update("coin", gorm.Expr(fmt.Sprintf("coin - %d", cost))).RowsAffected == 0 {
-				tx.Rollback()
-				return "扣款失败"
-			}
-			tx.Commit()
-			(&JdCookie{}).Push(fmt.Sprintf("有人许愿%s，愿望id为%d。", w.Content, w.ID))
-			return fmt.Sprintf("收到愿望，已扣除%d个许愿币。", cost)
-		},
-	},
-	{
-		Command: []string{"愿望达成", "达成愿望"},
-		Admin:   true,
-		Handle: func(sender *Sender) interface{} {
-			w := &Wish{}
-			id := Int(sender.JoinContens())
-			if id == 0 {
-				return "目标未指定"
-			}
-			if db.First(w, id).Error != nil {
-				return "目标不存在"
-			}
-			if w.Status == 1 {
-				return "愿望已撤销"
-			}
-			if w.Status == 2 {
-				return "愿望已达成"
-			}
-			if db.Model(w).Update("status", 2).RowsAffected == 0 {
-				return "操作失败"
-			}
-			sender.Reply(fmt.Sprintf("达成了愿望 %s", w.Content))
-			return nil
 		},
 	},
 	{
@@ -846,37 +536,9 @@ var codeSignals = []CodeSignal{
 		},
 	},
 	{
-		Command: []string{"降级"},
-		Handle: func(sender *Sender) interface{} {
-			return "才不呢"
-		},
-	},
-	{
 		Command: []string{"..."},
 		Handle: func(sender *Sender) interface{} {
 			return "你很无语呀"
-		},
-	},
-	{
-		Command: []string{"祈祷", "祈愿", "祈福"},
-		Handle: func(sender *Sender) interface{} {
-			if _, ok := mx[sender.UserID]; ok {
-				return "你祈祷过啦，等下次我忘记了再来吧。"
-			}
-			mx[sender.UserID] = true
-			if db.Model(User{}).Where("number = ? ", sender.UserID).Update(
-				"coin", gorm.Expr(fmt.Sprintf("coin + %d", 1)),
-			).RowsAffected == 0 {
-				return "先去打卡吧你。"
-			}
-			return "许愿币+1"
-		},
-	},
-	{
-		Command: []string{"撤销愿望"},
-		Handle: func(sender *Sender) interface{} {
-			ReturnCoin(sender)
-			return nil
 		},
 	},
 	{
@@ -1048,69 +710,6 @@ var codeSignals = []CodeSignal{
 	// 		return test
 	// 	},
 	// },
-	{
-		Command: []string{"转账"},
-		Handle: func(sender *Sender) interface{} {
-			cost := 1
-			if sender.ReplySenderUserID == 0 {
-				return "没有转账目标。"
-			}
-			amount := Int(sender.JoinContens())
-			if !sender.IsAdmin {
-				if amount <= 0 {
-					return "转账金额必须大于等于1。"
-				}
-			}
-			if sender.UserID == sender.ReplySenderUserID {
-				db.Model(User{}).Where("number = ?", sender.UserID).Updates(map[string]interface{}{
-					"coin": gorm.Expr(fmt.Sprintf("coin - %d", cost)),
-				})
-				return fmt.Sprintf("转账成功，扣除手续费%d枚许愿币。", cost)
-			}
-			if amount > 10000 {
-				return "单笔转账限额10000。"
-			}
-			tx := db.Begin()
-			s := &User{}
-			if err := db.Where("number = ?", sender.UserID).First(&s).Error; err != nil {
-				tx.Rollback()
-				return "你还没有开通钱包功能。"
-			}
-			if s.Coin < amount {
-				tx.Rollback()
-				return "余额不足。"
-			}
-			real := amount
-			if !sender.IsAdmin {
-				if amount <= cost {
-					tx.Rollback()
-					return fmt.Sprintf("转账失败，手续费需要%d个许愿币。", cost)
-				}
-				real = amount - cost
-			} else {
-				cost = 0
-			}
-			r := &User{}
-			if err := db.Where("number = ?", sender.ReplySenderUserID).First(&r).Error; err != nil {
-				tx.Rollback()
-				return "他还没有开通钱包功能"
-			}
-			if tx.Model(User{}).Where("number = ?", sender.UserID).Updates(map[string]interface{}{
-				"coin": gorm.Expr(fmt.Sprintf("coin - %d", amount)),
-			}).RowsAffected == 0 {
-				tx.Rollback()
-				return "转账失败"
-			}
-			if tx.Model(User{}).Where("number = ?", sender.ReplySenderUserID).Updates(map[string]interface{}{
-				"coin": gorm.Expr(fmt.Sprintf("coin + %d", real)),
-			}).RowsAffected == 0 {
-				tx.Rollback()
-				return "转账失败"
-			}
-			tx.Commit()
-			return fmt.Sprintf("转账成功，你的余额%d，他的余额%d，手续费%d。", s.Coin-amount, r.Coin+real, cost)
-		},
-	},
 	{
 		Command: []string{"献祭", "导出"},
 		Admin:   true,
