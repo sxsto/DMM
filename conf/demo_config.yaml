@@ -16,7 +16,6 @@ containers: #容器，可配置多个
 AtTime: #填写1-12之间的数 填错自负默认为10 10点容易出现高峰超时。
 IsHelp: #填写true或者false false
 IsOldV4: #填写true或者false false是否新版或者旧版V4
-ApiToken: #为空默认随机禁用
 Wskey: #填空默认禁用wskey转换 需要的填true
 IsAddFriend: #是否自动添加好友,填写true或者false,默认false
 Lim: #填写1-N 代表限制次数
