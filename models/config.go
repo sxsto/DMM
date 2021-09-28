@@ -40,7 +40,7 @@ type Yaml struct {
 	TGURL               string `yaml:"TGURL"`
 	SMSAddress          string `yaml:"SMSAddress"`
 	IsAddFriend         bool   `yaml:"IsAddFriend"`
-	Lim                 int    `yaml:"Lim"`
+	Limit               int    `yaml:"Limit"`
 	tytnum              int    `yaml:"tytnum"`
 	Node                string
 	Npm                 string
