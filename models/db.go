@@ -87,6 +87,7 @@ type JdCookie struct {
 	LoseAt       string `gorm:"column:LoseAt"`
 	PtKey        string `gorm:"column:PtKey"`
 	PtPin        string `gorm:"column:PtPin;unique"`
+	WsKey        string `gorm:"column:WsKey"`
 	Note         string `gorm:"column:Note"`
 	Available    string `gorm:"column:Available;default:true" validate:"oneof=true false"`
 	Nickname     string `gorm:"column:Nickname"`
@@ -115,7 +116,6 @@ type JdCookie struct {
 type JdCookiePool struct {
 	ID       int    `gorm:"column:ID;primaryKey"`
 	PtKey    string `gorm:"column:PtKey;unique"`
-	WsKey    string `gorm:"column:WsKey"`
 	PtPin    string `gorm:"column:PtPin"`
 	LoseAt   string `gorm:"column:LoseAt"`
 	CreateAt string `gorm:"column:CreateAt"`
