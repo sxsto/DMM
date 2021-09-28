@@ -180,10 +180,9 @@ func updateCookie() {
 	(&JdCookie{}).Push("开始定时更新转换Wskey")
 	for i := range cks {
 		if len(cks[i].WsKey) > 0 {
-			xx++
 			time.Sleep(10 * time.Second)
 			ck := cks[i]
-			JdCookie{}.Push(fmt.Sprintf("更新账号, %s", ck.Nickname))
+			// JdCookie{}.Push(fmt.Sprintf("更新账号, %s", ck.Nickname))
 			var pinky = fmt.Sprintf("pin=%s;wskey=%s;", ck.PtPin, ck.WsKey)
 			rsp, err := getKey(pinky)
 			if err != nil {
@@ -283,6 +282,7 @@ func CookieOK(ck *JdCookie) bool {
 								(&JdCookie{}).Push(fmt.Sprintf("转换失败，%s", nck.PtPin))
 							}
 						}
+
 					} else {
 						ck.Push(fmt.Sprintf("失效账号，%s", ck.PtPin))
 						JdCookie{}.Push(fmt.Sprintf("失效账号，%s", ck.Nickname))
@@ -291,6 +291,7 @@ func CookieOK(ck *JdCookie) bool {
 					ck.Push(fmt.Sprintf("失效账号，%s", ck.PtPin))
 					JdCookie{}.Push(fmt.Sprintf("失效账号，%s", ck.Nickname))
 				}
+
 			}
 			return false
 		}

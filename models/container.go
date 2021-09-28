@@ -555,6 +555,7 @@ func (c *Container) postConfig(handle func(config string) string) error {
 }
 
 func (c *Container) getSession() error {
+
 	if Config.IsOldV4 {
 		req := httplib.Post(c.Address + "/api/auth")
 		req.Param("username", c.Username)
@@ -592,4 +593,5 @@ func (c *Container) getSession() error {
 		}
 		return nil
 	}
+
 }

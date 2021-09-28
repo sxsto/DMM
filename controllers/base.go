@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/beego/beego/v2/adapter/logs"
+	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/go-playground/locales/zh"
 	ut "github.com/go-playground/universal-translator"

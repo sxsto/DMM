@@ -16,6 +16,17 @@ type User struct {
 	Womail   string
 }
 
+func ClearCoin(uid int) int {
+	var u User
+	if db.Where("number = ?", uid).First(&u).Error != nil {
+		return 0
+	}
+	db.Model(u).Updates(map[string]interface{}{
+		"coin": gorm.Expr(fmt.Sprintf("%d", 1)),
+	})
+	u.Coin = 1
+	return u.Coin
+}
 func AdddCoin(uid int, num int) int {
 	var u User
 	if db.Where("number = ?", uid).First(&u).Error != nil {
@@ -27,7 +38,6 @@ func AdddCoin(uid int, num int) int {
 	u.Coin += num
 	return u.Coin
 }
-
 func AddCoin(uid int) int {
 	var u User
 	if db.Where("number = ?", uid).First(&u).Error != nil {
@@ -53,17 +63,5 @@ func RemCoin(uid int, num int) int {
 func GetCoin(uid int) int {
 	var u User
 	db.Where("number = ?", uid).First(&u)
-	return u.Coin
-}
-
-func ClearCoin(uid int) int {
-	var u User
-	if db.Where("number = ?", uid).First(&u).Error != nil {
-		return 0
-	}
-	db.Model(u).Updates(map[string]interface{}{
-		"coin": gorm.Expr(fmt.Sprintf("%d", 1)),
-	})
-	u.Coin = 1
 	return u.Coin
 }
