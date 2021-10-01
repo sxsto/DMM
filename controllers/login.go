@@ -36,6 +36,11 @@ type StepThree struct {
 	Message string `json:"message"`
 }
 
+type StepThree1 struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
 type Result struct {
 	Code    int         `json:"code"`
 	Data    interface{} `json:"data"`
@@ -78,7 +83,7 @@ func (c *LoginController) GetUserInfo() {
 }
 
 func (c *LoginController) GetQrcode1() {
-	rsp, err := httplib.Get("https://api.kukuqaq.com/jd/qrcode").Response()
+	rsp, err := httplib.Post("https://api.kukuqaq.com/jd/qrcode").Response()
 	if err != nil {
 		logs.Info(err)
 	}
@@ -86,14 +91,22 @@ func (c *LoginController) GetQrcode1() {
 	if err1 == nil {
 		fmt.Println(string(body))
 	}
+
 	s := &models.QQuery{}
 	if len(body) > 0 {
-		json.Unmarshal(body, &s)
+		err := json.Unmarshal(body, &s)
+		if err != nil {
+			return
+		}
 	}
-	jsonByte, _ := json.Marshal(s)
-	jsonStr := string(jsonByte)
-	fmt.Printf("%v", jsonStr)
-	//c.Ctx.WriteString(`{"url":"` + "url" + `","img":"` + base64.StdEncoding.EncodeToString(data) + `"}`) //"data:image/png;base64," +
+	// jsonByte, _ := json.Marshal(s)
+	// jsonStr := string(jsonByte)
+	// fmt.Printf("%v", jsonStr)
+	//ddd, _ := base64.StdEncoding.DecodeString(s.Data.QqLoginQrcode.Bytes)
+	//c.Ctx.WriteString(`{"url":"` + "url" + `","img":"` + base64.StdEncoding.EncodeToString(ddd) + `"}`) //"data:image/png;base64," +
+	//logs.Info(`{"url":"` + "url" + `","img":"` + s.Data.QqLoginQrcode.Bytes + `"}`)
+	c.Ctx.WriteString(s.Data.QqLoginQrcode.Bytes)
+	return
 
 }
 
@@ -199,13 +212,15 @@ func init() {
 				jd_token := k.(string)
 				vv := v.([]interface{})
 				if len(vv) >= 2 {
-					cookie := vv[0].(string)
-					okl_token := vv[1].(string)
+					// cookie := vv[0].(string)
+					// okl_token := vv[1].(string)
 					bot := vv[2].(string)
 					uid := vv[3].(int)
 					gid := vv[4].(int)
 					// fmt.Println(jd_token, cookie, okl_token)
-					result, ck := CheckLogin(jd_token, cookie, okl_token)
+					result, ck := CheckLogin(models.QQuery{
+						Code: 0,
+					}, jd_token)
 					// fmt.Println(result)
 					switch result {
 					case "成功":
@@ -288,40 +303,28 @@ func (c *LoginController) Query() {
 	}
 }
 
-func CheckLogin(token, cookie, okl_token string) (string, *models.JdCookie) {
-	state := time.Now().Unix()
-	req := httplib.Post(
-		fmt.Sprintf(`https://plogin.m.jd.com/cgi-bin/m/tmauthchecktoken?&token=%s&ou_state=0&okl_token=%s`,
-			token,
-			okl_token,
-		),
-	)
-	req.Header("Referer", fmt.Sprintf(`https://plogin.m.jd.com/login/login?appid=300&returnurl=https://wqlogin2.jd.com/passport/LoginRedirect?state=%d&returnurl=//home.m.jd.com/myJd/newhome.action?sceneval=2&ufc=&/myJd/home.action&source=wq_passport`,
-		state),
-	)
-	req.Header("Cookie", cookie)
-	req.Header("Connection", "Keep-Alive")
-	req.Header("Content-Type", "application/x-www-form-urlencoded; Charset=UTF-8")
-	req.Header("Accept", "application/json, text/plain, */*")
-	req.Header("User-Agent", jdua())
-	req.Header("Host", "plogin.m.jd.com")
+func CheckLogin(q models.QQuery, token string) (string, *models.JdCookie) {
+	//state := time.Now().Unix()
+	req := httplib.Post("https://api.kukuqaq.com/jd/cookie")
+	req.Param("sig", q.Data.QqLoginQrcode.Sig)
+	req.Param("type", string(1))
 
-	req.Param("lang", "chs")
-	req.Param("appid", "300")
-	req.Param("returnurl", fmt.Sprintf("https://wqlogin2.jd.com/passport/LoginRedirect?state=%d&returnurl=//home.m.jd.com/myJd/newhome.action?sceneval=2&ufc=&/myJd/home.action", state))
-	req.Param("source", "wq_passport")
+	req.Param("redirectUrl", q.Data.RedirectURL)
+	req.Param("state", q.Data.State)
+	req.Param("tempCookie", q.Data.TempCookie)
+	req.Param("lSid", q.Data.LSid)
 
 	rsp, err := req.Response()
 	if err != nil {
 		return "", nil //err.Error()
 	}
 	data, err := ioutil.ReadAll(rsp.Body)
-	sth := StepThree{}
+	sth := StepThree1{}
 	err = json.Unmarshal(data, &sth)
 	if err != nil {
 		return "", nil //err.Error()
 	}
-	switch sth.Errcode {
+	switch sth.Code {
 	case 0:
 		cookies := strings.Join(rsp.Header.Values("Set-Cookie"), " ")
 		pt_key := FetchJdCookieValue("pt_key", cookies)
@@ -354,19 +357,19 @@ func CheckLogin(token, cookie, okl_token string) (string, *models.JdCookie) {
 		}()
 		JdCookieRunners.Store(token, []interface{}{pt_pin})
 		return "成功", &ck
-	case 19: //Token无效，请退出重试
+	case 500: //Token无效，请退出重试
 		JdCookieRunners.Delete(token)
 		return sth.Message, nil
-	case 21: //Token不存在，请退出重试
-		JdCookieRunners.Delete(token)
-		return sth.Message, nil
-	case 176: //授权登录未确认
-		return sth.Message, nil
-	case 258: //务异常，请稍后重试
-		return "", nil
-	case 264: //出错了，请退出重试
-		// JdCookieRunners.Delete(token)
-		// return sth.Message, nil
+	//case 21: //Token不存在，请退出重试
+	//	JdCookieRunners.Delete(token)
+	//	return sth.Message, nil
+	//case 176: //授权登录未确认
+	//	return sth.Message, nil
+	//case 258: //务异常，请稍后重试
+	//	return "", nil
+	//case 264: //出错了，请退出重试
+	//	// JdCookieRunners.Delete(token)
+	//	// return sth.Message, nil
 	default:
 		JdCookieRunners.Delete(token)
 		// fmt.Println(sth)
@@ -501,7 +504,7 @@ func (c *LoginController) SMSLogin() {
 				ck.Query()
 				msg := fmt.Sprintf("来自短信的添加,账号：%s,QQ: %s", ck.PtPin, qq)
 				(&models.JdCookie{}).Push(msg)
-			} else if !models.HasKey(ptKey) {
+			} else {
 				ck, _ := models.GetJdCookie(ptPin)
 				ck.InPool(ptKey)
 				if qq != "" {

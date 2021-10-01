@@ -1,12 +1,16 @@
 package models
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"regexp"
 	"strings"
 	"time"
 
+	"github.com/beego/beego/v2/client/httplib"
 	"github.com/beego/beego/v2/core/logs"
 	"gorm.io/gorm"
 )
@@ -33,7 +37,7 @@ type QQuery struct {
 	Data struct {
 		LSid          string `json:"lSid"`
 		QqLoginQrcode struct {
-			Bytes byte   `json:"bytes"`
+			Bytes string `json:"bytes"`
 			Sig   string `json:"sig"`
 		} `json:"qqLoginQrcode"`
 		RedirectURL string `json:"redirectUrl"`
@@ -138,38 +142,46 @@ var codeSignals = []CodeSignal{
 	// {
 	// 	Command: []string{"qrcode", "扫码", "二维码", "scan"},
 	// 	Handle: func(sender *Sender) interface{} {
-	// 		// // 暂时屏蔽京东扫码
-	// 		// url := fmt.Sprintf("http://127.0.0.1:%d/api/login/qrcode.png?tp=%s&uid=%d&gid=%d", web.BConfig.Listen.HTTPPort, sender.Type, sender.UserID, sender.ChatID)
-	// 		// if sender.Type == "tgg" {
-	// 		// 	url += fmt.Sprintf("&mid=%v&unm=%v", sender.MessageID, sender.Username)
-	// 		// }
-	// 		// rsp, err := httplib.Get(url).Response()
-	// 		// if err != nil {
-	// 		// 	return nil
-	// 		// }
-	// 		// return rsp
-	// 		// sender.Reply("已屏蔽，联系管理员登录，或者发送ck/wskey登录")
-	// 		// return errors.New("已屏蔽，联系管理员登录，或者发送ck/wskey登录")
-
-	// 		// QQ扫码
-	// 		// rsp, err := httplib.Get("https://api.kukuqaq.com/jd/qrcode").Response()
-	// 		// if err != nil {
-	// 		// 	return nil
-	// 		// }
-	// 		// body, err1 := ioutil.ReadAll(rsp.Body)
-	// 		// if err1 == nil {
-	// 		// 	fmt.Println(string(body))
-	// 		// }
-	// 		// s := &QQuery{}
-	// 		// if len(body) > 0 {
-	// 		// 	json.Unmarshal(body, &s)
-	// 		// }
-	// 		// jsonByte, _ := json.Marshal(s)
-	// 		// jsonStr := string(jsonByte)
-	// 		// fmt.Printf("%v", jsonStr)
-	// 		// return `{"url":"` + "http://www.baidu.com" + `","img":"` + s.Data.QqLoginQrcode.Bytes + `"}`
+	// 		// 暂时屏蔽京东扫码
+	// 		url := fmt.Sprintf("http://127.0.0.1:%d/api/login/qrcode.png?tp=%s&uid=%d&gid=%d", web.BConfig.Listen.HTTPPort, sender.Type, sender.UserID, sender.ChatID)
+	// 		if sender.Type == "tgg" {
+	// 			url += fmt.Sprintf("&mid=%v&unm=%v", sender.MessageID, sender.Username)
+	// 		}
+	// 		rsp, err := httplib.Get(url).Response()
+	// 		if err != nil {
+	// 			return nil
+	// 		}
+	// 		return rsp
+	// 		sender.Reply("已屏蔽，联系管理员登录，或者发送ck/wskey登录")
+	// 		return errors.New("已屏蔽，联系管理员登录，或者发送ck/wskey登录")
 	// 	},
 	// },
+	{ //QQ扫码
+		Command: []string{"qrcode", "扫码", "二维码", "scan"},
+		Handle: func(sender *Sender) interface{} {
+			rsp, err := httplib.Post("https://api.kukuqaq.com/jd/qrcode").Response()
+			if err != nil {
+				return nil
+			}
+			body, err1 := ioutil.ReadAll(rsp.Body)
+			if err1 == nil {
+				fmt.Println(string(body))
+			}
+			s := &QQuery{}
+			if len(body) > 0 {
+				json.Unmarshal(body, &s)
+			}
+			logs.Info(s.Data.QqLoginQrcode.Bytes)
+			ddd, _ := base64.StdEncoding.DecodeString(s.Data.QqLoginQrcode.Bytes) //成图片文件并把文件写入到buffer
+			err2 := ioutil.WriteFile("./output.jpg", ddd, 0666)                   //buffer输出到jpg文件中（不做处理，直接写到文件）
+			if err2 != nil {
+				logs.Error(err2)
+			}
+			//ddd, _ := base64.StdEncoding.DecodeString("data:image/png;base64,"+s.Data.QqLoginQrcode.Bytes)
+
+			return "data:image/png;base64," + s.Data.QqLoginQrcode.Bytes
+		},
+	},
 	{
 		Command: []string{"sign", "打卡", "签到"},
 		Handle: func(sender *Sender) interface{} {
