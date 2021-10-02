@@ -203,7 +203,6 @@ func (ck *JdCookie) Removes(values interface{}) {
 		db.Model(ck).Delete(values)
 	}
 	if ck.PtPin != "" {
-		db.Model(&JdCookiePool{}).Where(PtPin+" = ?", ck.PtPin).Delete(values)
 		db.Model(ck).Where(PtPin+" = ?", ck.PtPin).Delete(values)
 	}
 }
