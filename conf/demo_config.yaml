@@ -8,11 +8,6 @@ containers: #容器，可配置多个
   #   weigth:  #权重 balance模式下权重越高分得的ck越多，默认1
   #   mode: parallel #单独对容器进行模式设置
   #   limit: 999 #限制容器ck数目
-  # - address: http://192.168.31.233:5525
-  #   username: admin
-  #   password: admin
-  # - path: /root/ql/config/config.sh #本地配置文件路径 v1v2v3v4v5和不知名容器的配置
-  # - path: /Users/sxsto/Desktop/dmm/list.sh
 AtTime: #填写1-12之间的数 填错自负默认为10 10点容易出现高峰超时。
 IsHelp: #填写true或者false false
 IsOldV4: #填写true或者false false是否新版或者旧版V4
@@ -21,6 +16,7 @@ IsAddFriend: #是否自动添加好友,填写true或者false,默认false
 Lim: #填写1-N 代表限制次数
 Tyt: #填写1-N 代表推一推需要的互助值，默认为8
 Later: #延时防止黑IP自己设置 默认60 不怕黑的改为1即可 单位是秒
+ApiToken: #短信接入token参数
 theme: #自定义主题，支持本地、网络路径
 static: ./static #静态文件 便于自定义二维码页面时，引入css、js等文件
 master: #管理员账户pin，有多个用'&'拼接
