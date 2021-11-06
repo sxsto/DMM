@@ -11,8 +11,8 @@ import (
 	"github.com/beego/beego/v2/core/logs"
 )
 
-var version = "2021110501"
-var describe = "增加ApiToken参数"
+var version = "2021110601"
+var describe = "修复删除候无法短信登录问题"
 var AppName = "dmm"
 var pname = regexp.MustCompile(`/([^/\s]+)`).FindStringSubmatch(os.Args[0])[1]
 
