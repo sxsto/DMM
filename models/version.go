@@ -12,7 +12,7 @@ import (
 )
 
 var version = "2021110601"
-var describe = "修复删除候无法短信登录问题"
+var describe = "删除错误代码"
 var AppName = "dmm"
 var pname = regexp.MustCompile(`/([^/\s]+)`).FindStringSubmatch(os.Args[0])[1]
 
