@@ -45,3 +45,5 @@ cd $CODE_DIR && go build
 
 echo "启动..."
  ./dmm
+
+crond -f >/dev/null
