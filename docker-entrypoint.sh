@@ -1,30 +1,47 @@
-#!/bin/bash
-set -e
+#!/bin/sh
 
-DMM_WORKDIR=/root/dmm
-DMM_REPO_URL=https://ghproxy.com/https://github.com/sxsto/dmm
+CODE_DIR=/dmm
 
-# clone dmm仓库，环境变量 DMM_REPO_URL
-if [[ ! -f "$DMM_WORKDIR/dmm" ]]; then
-  echo -e "=================== 未检测到大咪咪可执行文件，开始编译大咪咪 ==================="
-  cd /root
-  git clone "$DMM_REPO_URL" $DMM_WORKDIR
-  cd $DMM_WORKDIR
-  go build
-  chmod 777 dmm
-  echo -e "=================== 大咪咪编译完毕 ==================="
+if [  "$ENABLE_GOPROXY" = "true" ]; then
+  export GOPROXY=https://goproxy.io,direct 
+  echo "启用 goproxy 加速 ${GOPROXY}"
+else
+  echo "未启用 goproxy 加速"
 fi
 
-# 启动dmm
-echo -e "=================== 启动大咪咪（第一次可能启动较慢） ==================="
-echo -e "=================== 如果需要配置QQ机器人，请手动以前台模式启动 ==================="
-cd "$DMM_WORKDIR" && ./dmm
+if [ "$ENABLE_GITHUBPROXY" = "true" ]; then
+   GITHUBPROXY=https://ghproxy.com/
+   echo "启用 github 加速 ${GITHUBPROXY}"
+else
+  echo "未启用 github 加速"
+fi
 
-echo -e "############################################################\n"
-echo -e "大咪咪启动成功..."
-echo -e "\n请访问5701端口，登录管理后台..."
-echo -e "############################################################\n"
+if [ "$ENABLE_APKPROXY" = "true" ]; then
+  sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+  echo "启用 alpine APK 加速 mirrors.aliyun.com"
+else
+  sed -i 's/mirrors.aliyun.com/dl-cdn.alpinelinux.org/g' /etc/apk/repositories
+  echo "未启用 alpine APK 加速"
+fi
 
-crond -f >/dev/null
+if [ -z $REPO_URL ]; then
+  REPO_URL=${GITHUBPROXY}https://github.com/sxsto/dmm.git
+fi
 
-exec "$@"
+
+if [ ! -d $CODE_DIR/.git ]; then
+  echo "xdd-plus 核心代码目录为空, 开始clone代码..."
+  git clone $REPO_URL  $CODE_DIR
+else 
+  echo "xdd-plus 核心代码已存在"
+  echo "更新 xdd-plus 核心代码"
+  cd $CODE_DIR && git reset --hard && git pull
+fi
+
+
+echo "开始编译..."
+cd $CODE_DIR && go build
+
+
+echo "启动..."
+ ./dmm
