@@ -13,7 +13,7 @@ import (
 	"github.com/beego/beego/v2/server/web"
 	"github.com/sxsto/dmm/controllers"
 	"github.com/sxsto/dmm/models"
-	"github.com/sxsto/dmm/qbot"
+	// "github.com/sxsto/dmm/qbot"
 )
 
 var theme = ""
@@ -82,8 +82,8 @@ func main() {
 		time.Sleep(time.Second * 4)
 		(&models.JdCookie{}).Push("大咪咪已启动")
 	}()
-	if models.Config.QQID != 0 || models.Config.QQGroupID != 0 {
-		go qbot.Main()
-	}
+	// if models.Config.QQID != 0 || models.Config.QQGroupID != 0 {
+	// 	go qbot.Main()
+	// }
 	web.Run()
 }
