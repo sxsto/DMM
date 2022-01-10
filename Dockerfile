@@ -1,4 +1,4 @@
-FROM node:lts-alpine3.14
+FROM node:lts-alpine3.15
 
 # region 安装golang编译环境
 RUN apk add --no-cache \
